@@ -1,8 +1,18 @@
 import CustomerHeader from "./CustomerHeader";
 import "./Profile.css";
 import React, { useState } from "react";
+import { useEffect } from "react";
 
-const Profile = ({ customerData }) => {
+const Profile = () => {
+  const [customerData, setCustomerData] = useState([]);
+
+  useEffect(() => {
+    fetch(`http://localhost:8080/api/customers/view-customer/98987788`)
+      .then((response) => response.json())
+      .then((data) => setCustomerData(data))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+  console.log(customerData);
   return (
     <div>
       <CustomerHeader></CustomerHeader>
@@ -14,7 +24,7 @@ const Profile = ({ customerData }) => {
             <tr>
               <th>Account No</th>
               <th>Name</th>
-              <th>DOB</th>
+              <th>Date Of Birth</th>
               <th>PAN</th>
               <th>Address</th>
               <th>Account Type</th>
@@ -24,7 +34,7 @@ const Profile = ({ customerData }) => {
 
           <tbody>
             {customerData.map((customer) => (
-              <tr key={customer.accountNo}>
+              <tr key={customer.accountType}>
                 <td className="align-middle">{customer.accountNo}</td>
                 <td className="align-middle">{customer.name}</td>
                 <td className="align-middle">{customer.dob}</td>

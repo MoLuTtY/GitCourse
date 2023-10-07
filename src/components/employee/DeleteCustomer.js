@@ -2,9 +2,10 @@ import EmployeeHeader from "./EmployeeHeader";
 import "./DeleteCustomer.css";
 import ViewCustomerHeader from "./ViewCustomerHeader";
 import deleteCustomer from "../images/deleteCustomer.jpg";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import SuccessAlert from "../SuccessAlert";
+import axios from "axios";
 
 const DeleteCustomer = () => {
   const navigate = useNavigate("");
@@ -13,17 +14,49 @@ const DeleteCustomer = () => {
 
   const accountNo = location.state && location.state.accountNo;
   const [successAlert, setSuccessAlert] = useState(false);
+  const [customerId, setCustomerId] = useState("");
 
-  const deleteCustomerSubmitHandler = (e) => {
+  useEffect(() => {
+    const fetchCustomerId = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8090/api/accounts/get-customerId/${accountNo}`
+        );
+        const data = response.data;
+        setCustomerId(data);
+      } catch (error) {
+        console.error("Error fetching customerId:", error);
+      }
+    };
+
+    fetchCustomerId();
+  }, [accountNo]);
+
+  // const deleteCustomerSubmitHandler = (e) => {
+  //   e.preventDefault();
+
+  //   const isConfirmed = window.confirm(
+  //     "Are you sure you want to delete this customer?"
+  //   );
+  // };
+
+  const deleteCustomerSubmitHandler = async (e) => {
     e.preventDefault();
+
     const isConfirmed = window.confirm(
-      "Are you sure you want to delete this customer?"
+      "Are you sure you want to delete all accounts with this account number?"
     );
 
     if (isConfirmed) {
-      console.log("Customer deleted successfully");
-      console.log("Account No", accountNo);
-      setSuccessAlert(true);
+      console.log(customerId);
+      try {
+        await axios.delete(
+          `http://localhost:8080/api/customers/delete-customer/${customerId}`
+        );
+        setSuccessAlert(true);
+      } catch (error) {
+        console.error("Error deleting accounts:", error);
+      }
     }
   };
 

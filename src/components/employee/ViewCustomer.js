@@ -3,9 +3,8 @@ import "./ViewCustomer.css";
 import { useNavigate } from "react-router-dom";
 
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
+import axios from "axios";
 import {
   faTrash,
   faMinusSquare,
@@ -15,98 +14,78 @@ import {
 const ViewCustomer = ({ customerData }) => {
   const navigate = useNavigate();
   const [enteredAccountNo, setAccountNo] = useState("");
-  const [enteredAccountType, setAccountType] = useState("savings");
+  const [enteredAccountType, setAccountType] = useState("SAVINGS");
   const [searchResults, setSearchResults] = useState([]);
-  const [searchPerformed, setSearchPerformed] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isServiceChargeHovered, setIsServiceChargeHovered] = useState(false);
   const [isDeleteHovered, setIsDeleteHovered] = useState(false);
-  const [allTransactions, setAllTransactions] = useState([]);
+
+  const [customersDetailsSavings, setCustomersDetailsSavings] = useState([]);
+  const [customerDetailsTable, setCustomerDetailsTable] = useState(false);
+  const [searchCustomerTable, setSearchCustomerTable] = useState(false);
+  const [notExist, setnotExist] = useState(false);
 
   useEffect(() => {
-    const savingsTransactions = customerProfile.filter(
-      (profile) => profile.accountType === "savings"
-    );
-    setAllTransactions(savingsTransactions);
+    fetch(
+      "http://localhost:8080/api/customers/allCustomers-with-savings-account"
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCustomersDetailsSavings(data);
+          setCustomerDetailsTable(true);
+        } else {
+          setCustomerDetailsTable(true);
+          console.error("Fetched data is not an array:", data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching customer data:", error);
+      });
   }, []);
 
-  const sortedTransactions = allTransactions.sort(
+  const sortedTransactions = customersDetailsSavings.sort(
     (a, b) => b.accountNo - a.accountNo
   );
 
-  const customerProfile = [
-    {
-      accountNo: 1236603040001,
-      name: "Amal Varma",
-      dob: "3-4-1999",
-      pan: "DGTRE2366P",
-      address: "Abc house, Calicut, Kerala, 675453",
-      accountType: "savings",
-      currentBalance: 100,
-    },
-    {
-      accountNo: 1236603040001,
-      name: "Amal Varma",
-      dob: "3-4-1999",
-      pan: "DGTRE2366P",
-      address: "Abc house, Calicut, Kerala, 675453",
-      accountType: "current",
-      currentBalance: 10000,
-    },
-    {
-      accountNo: 1788598740002,
-      name: "Vishnu Ram",
-      dob: "9-10-1997",
-      pan: "GHTEI3455P",
-      address: "Def house, Kochi, Kerala, 653239",
-      accountType: "savings",
-      currentBalance: 78000,
-    },
-    {
-      accountNo: 1788598740002,
-      name: "Vishnu Ram",
-      dob: "9-10-1997",
-      pan: "GHTEI3455P",
-      address: "Def house, Kochi, Kerala, 653239",
-      accountType: "current",
-      currentBalance: 30000,
-    },
-    {
-      accountNo: 1909803040003,
-      name: "Lalu Surya",
-      dob: "20-4-19996",
-      pan: "FGJUY6766K",
-      address: "Xyz house, kannur, Kerala, 675432",
-      accountType: "savings",
-      currentBalance: 9000,
-    },
-    {
-      accountNo: 1909803040003,
-      name: "Lalu Surya",
-      dob: "20-4-19996",
-      pan: "FGJUY6766K",
-      address: "Xyz house, Kannur, Kerala, 675432",
-      accountType: "current",
-      currentBalance: 15000,
-    },
-  ];
-
-  const searchCustomerHandler = (e) => {
+  const searchCustomerHandler = async (e) => {
     e.preventDefault();
-    const filteredProfiles = customerProfile.filter(
-      (profile) =>
-        profile.accountNo === Number(enteredAccountNo) &&
-        profile.accountType === enteredAccountType
-    );
-    console.log(enteredAccountNo);
-    console.log(enteredAccountType);
+    setCustomerDetailsTable(false);
+    setnotExist(false);
 
-    setSearchResults(filteredProfiles);
-    setSearchPerformed(true);
+    try {
+      const apiUrl = `http://localhost:8080/api/customers/search-customer/${enteredAccountNo}/${enteredAccountType}`;
+      const response = await axios.get(apiUrl);
+
+      if (response.status !== 200) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const responseData = response.data;
+
+      if (Array.isArray(responseData)) {
+        setSearchResults(responseData);
+        setSearchCustomerTable(true);
+      } else if (typeof responseData === "object") {
+        setSearchResults([responseData]);
+        setSearchCustomerTable(true);
+      } else {
+        console.error("API response is not an array or object:", responseData);
+      }
+    } catch (error) {
+      setCustomerDetailsTable(false);
+      setSearchCustomerTable(false);
+      setnotExist(true);
+      console.error("Error:", error);
+    }
   };
 
-  const depositHandler = (accountNo) => {
-    navigate("/deposit", { state: { accountNo } });
+  const depositHandler = (accountNo, accountType) => {
+    // navigate("/deposit", { state: { accountNo, accountType } });
+    navigate("/deposit", {
+      state: { accountNo, accountType },
+    });
+    console.log(accountNo + " " + accountType);
   };
 
   const servicechargeHandler = (accountNo, accountType) => {
@@ -168,7 +147,6 @@ const ViewCustomer = ({ customerData }) => {
                 onChange={(e) => setAccountNo(e.target.value)}
               />
             </div>
-
             <div class="col-sm-4 form-group">
               <label for="accountType">Account Type:</label>
               <div class="input-group">
@@ -178,12 +156,11 @@ const ViewCustomer = ({ customerData }) => {
                   name="accountType"
                   onChange={(e) => setAccountType(e.target.value)}
                 >
-                  <option value="savings">savings</option>
-                  <option value="current">current</option>
+                  <option value="SAVINGS">SAVINGS</option>
+                  <option value="CURRENT">CURRENT</option>
                 </select>
               </div>
             </div>
-
             <div class="col-sm-4 mt-4">
               <button type="submit" class="btn btn-primary">
                 Search
@@ -194,10 +171,8 @@ const ViewCustomer = ({ customerData }) => {
 
         <div className="table-service-container">
           <div class="container mt-5 ">
-            <table class="table table-bordered table-striped text-center">
-              {((searchPerformed && searchResults != 0) ||
-                (searchPerformed && sortedTransactions > 0) ||
-                !searchPerformed) && (
+            {customerDetailsTable && (
+              <table class="table table-bordered table-striped text-center">
                 <thead class="thead-dark">
                   <tr>
                     <th>Account No</th>
@@ -210,220 +185,244 @@ const ViewCustomer = ({ customerData }) => {
                     <th>Action</th>
                   </tr>
                 </thead>
-              )}
 
-              <tbody>
-                {searchPerformed
-                  ? searchResults.map((profile) => (
-                      <tr key={profile.accountNo}>
-                        <td className="align-middle">{profile.accountNo}</td>
-                        <td className="align-middle">{profile.name}</td>
-                        <td className="align-middle">{profile.dob}</td>
-                        <td className="align-middle">{profile.pan}</td>
-                        <td className="align-middle">{profile.address}</td>
-                        <td className="align-middle">{profile.accountType}</td>
-                        <td className="align-middle">
-                          &#x20B9;{profile.currentBalance}
-                        </td>
-                        <td>
-                          <div className="custom-list-container">
-                            <ul className="custom-list">
-                              <li
-                                className="icon-container"
-                                onMouseEnter={() => setIsHovered(true)}
-                                onMouseLeave={() => setIsHovered(false)}
-                              >
-                                <span
-                                  className="icon"
-                                  onClick={() =>
-                                    depositHandler(profile.accountNo)
-                                  }
-                                >
-                                  <FontAwesomeIcon
-                                    className="cursor"
-                                    icon={faPlusSquare}
-                                  />
-                                  {isHovered && (
-                                    <span className="text">Deposit</span>
-                                  )}
-                                </span>
-                              </li>
-
-                              <li
-                                className="icon-container"
-                                onMouseEnter={() =>
-                                  setIsServiceChargeHovered(true)
-                                }
-                                onMouseLeave={() =>
-                                  setIsServiceChargeHovered(false)
+                <tbody>
+                  {sortedTransactions.map((customer) => (
+                    <tr key={customer.id}>
+                      <td className="align-middle">{customer.accountNo}</td>
+                      <td className="align-middle">{customer.customerName}</td>
+                      <td className="align-middle">{customer.dateOfBirth}</td>
+                      <td className="align-middle">{customer.pan}</td>
+                      <td className="align-middle">{customer.address}</td>
+                      <td className="align-middle">{customer.accountType}</td>
+                      <td className="align-middle">
+                        &#x20B9;{customer.currentBalance}
+                      </td>
+                      <td>
+                        <div className="custom-list-container">
+                          <ul className="custom-list">
+                            <li
+                              className="icon-container"
+                              onMouseEnter={() => setIsHovered(true)}
+                              onMouseLeave={() => setIsHovered(false)}
+                            >
+                              <span
+                                className="icon"
+                                onClick={() =>
+                                  depositHandler(
+                                    customer.accountNo,
+                                    customer.accountType
+                                  )
                                 }
                               >
-                                <span
-                                  className={`icon ${
-                                    isServiceChargeHovered ? "hovered" : ""
-                                  }`}
-                                  // onClick={() =>
-                                  //   servicechargeHandler(
-                                  //     enteredAccountNo,
-                                  //     enteredAccountType
-                                  //   )
-                                  // }
-                                  onClick={() =>
-                                    servicechargeHandler(
-                                      profile.accountNo,
-                                      profile.accountType
-                                    )
-                                  }
-                                >
-                                  <FontAwesomeIcon
-                                    icon={faMinusSquare}
-                                    className="cursor"
-                                  />
-                                  {isServiceChargeHovered && (
-                                    <span className="text">Service Charge</span>
-                                  )}
-                                </span>
-                              </li>
+                                <FontAwesomeIcon
+                                  className="cursor"
+                                  icon={faPlusSquare}
+                                />
+                                {isHovered && (
+                                  <span className="text">Deposit</span>
+                                )}
+                              </span>
+                            </li>
 
-                              <li
-                                className="icon-container"
-                                onMouseEnter={() => setIsDeleteHovered(true)}
-                                onMouseLeave={() => setIsDeleteHovered(false)}
-                              >
-                                <span
-                                  className={`icon ${
-                                    isDeleteHovered ? "hovered" : ""
-                                  }`}
-                                  onClick={() =>
-                                    deleteCustomerHandler(profile.accountNo)
-                                  }
-                                >
-                                  <FontAwesomeIcon
-                                    icon={faTrash}
-                                    className="cursor"
-                                  />
-                                  {isDeleteHovered && (
-                                    <span className="text">
-                                      Delete customer
-                                    </span>
-                                  )}
-                                </span>
-                              </li>
-                            </ul>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  : sortedTransactions.map((transaction) => (
-                      <tr key={transaction.id}>
-                        <td className="align-middle">
-                          {transaction.accountNo}
-                        </td>
-                        <td className="align-middle">{transaction.name}</td>
-                        <td className="align-middle">{transaction.dob}</td>
-                        <td className="align-middle">{transaction.pan}</td>
-                        <td className="align-middle">{transaction.address}</td>
-                        <td className="align-middle">
-                          {transaction.accountType}
-                        </td>
-                        <td className="align-middle">
-                          &#x20B9;{transaction.currentBalance}
-                        </td>
-                        <td>
-                          <div className="custom-list-container">
-                            <ul className="custom-list">
-                              <li
-                                className="icon-container"
-                                onMouseEnter={() => setIsHovered(true)}
-                                onMouseLeave={() => setIsHovered(false)}
-                              >
-                                <span
-                                  className="icon"
-                                  onClick={() =>
-                                    depositHandler(transaction.accountNo)
-                                  }
-                                >
-                                  <FontAwesomeIcon
-                                    className="cursor"
-                                    icon={faPlusSquare}
-                                  />
-                                  {isHovered && (
-                                    <span className="text">Deposit</span>
-                                  )}
-                                </span>
-                              </li>
-
-                              <li
-                                className="icon-container"
-                                onMouseEnter={() =>
-                                  setIsServiceChargeHovered(true)
-                                }
-                                onMouseLeave={() =>
-                                  setIsServiceChargeHovered(false)
+                            <li
+                              className="icon-container"
+                              onMouseEnter={() =>
+                                setIsServiceChargeHovered(true)
+                              }
+                              onMouseLeave={() =>
+                                setIsServiceChargeHovered(false)
+                              }
+                            >
+                              <span
+                                className={`icon ${
+                                  isServiceChargeHovered ? "hovered" : ""
+                                }`}
+                                onClick={() =>
+                                  servicechargeHandler(
+                                    customer.accountNo,
+                                    customer.accountType
+                                  )
                                 }
                               >
-                                <span
-                                  className={`icon ${
-                                    isServiceChargeHovered ? "hovered" : ""
-                                  }`}
-                                  onClick={() =>
-                                    // servicechargeHandler(transaction.accountNo)
-                                    servicechargeHandler(
-                                      transaction.accountNo,
-                                      transaction.accountType
-                                    )
-                                  }
-                                >
-                                  <FontAwesomeIcon
-                                    icon={faMinusSquare}
-                                    className="cursor"
-                                  />
-                                  {isServiceChargeHovered && (
-                                    <span className="text">Service Charge</span>
-                                  )}
-                                </span>
-                              </li>
+                                <FontAwesomeIcon
+                                  icon={faMinusSquare}
+                                  className="cursor"
+                                />
+                                {isServiceChargeHovered && (
+                                  <span className="text">Service Charge</span>
+                                )}
+                              </span>
+                            </li>
 
-                              <li
-                                className="icon-container"
-                                onMouseEnter={() => setIsDeleteHovered(true)}
-                                onMouseLeave={() => setIsDeleteHovered(false)}
+                            <li
+                              className="icon-container"
+                              onMouseEnter={() => setIsDeleteHovered(true)}
+                              onMouseLeave={() => setIsDeleteHovered(false)}
+                            >
+                              <span
+                                className={`icon ${
+                                  isDeleteHovered ? "hovered" : ""
+                                }`}
+                                onClick={() =>
+                                  deleteCustomerHandler(customer.accountNo)
+                                }
                               >
-                                <span
-                                  className={`icon ${
-                                    isDeleteHovered ? "hovered" : ""
-                                  }`}
-                                  onClick={() =>
-                                    deleteCustomerHandler(transaction.accountNo)
-                                  }
-                                >
-                                  <FontAwesomeIcon
-                                    icon={faTrash}
-                                    className="cursor"
-                                  />
-                                  {isDeleteHovered && (
-                                    <span className="text">
-                                      Delete customer
-                                    </span>
-                                  )}
-                                </span>
-                              </li>
-                            </ul>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-              </tbody>
-            </table>
-            {searchPerformed && searchResults == 0 && (
-              <div style={styles.container}>
-                <div style={styles.content}>
-                  <h1 style={styles.text}>Customer Does Not Exist</h1>
-                </div>
-              </div>
+                                <FontAwesomeIcon
+                                  icon={faTrash}
+                                  className="cursor"
+                                />
+                                {isDeleteHovered && (
+                                  <span className="text">Delete customer</span>
+                                )}
+                              </span>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </div>
         </div>
+
+        {/*  */}
+
+        <div className="table-service-container">
+          <div class="container mt-5 ">
+            {searchCustomerTable && (
+              <table class="table table-bordered table-striped text-center">
+                <thead class="thead-dark">
+                  <tr>
+                    <th>Account No</th>
+                    <th>Name</th>
+                    <th>DOB</th>
+                    <th>PAN</th>
+                    <th>Address</th>
+                    <th>Account type</th>
+                    <th>Current Balance</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {searchResults.map((responseData) => (
+                    <tr key={responseData.accountNo}>
+                      <td className="align-middle">{responseData.accountNo}</td>
+                      <td className="align-middle">
+                        {responseData.customerName}
+                      </td>
+                      <td className="align-middle">
+                        {responseData.dateOfBirth}
+                      </td>
+                      <td className="align-middle">{responseData.pan}</td>
+                      <td className="align-middle">{responseData.address}</td>
+                      <td className="align-middle">
+                        {responseData.accountType}
+                      </td>
+                      <td className="align-middle">
+                        &#x20B9;{responseData.currentBalance}
+                      </td>
+                      <td>
+                        <div className="custom-list-container">
+                          <ul className="custom-list">
+                            <li
+                              className="icon-container"
+                              onMouseEnter={() => setIsHovered(true)}
+                              onMouseLeave={() => setIsHovered(false)}
+                            >
+                              <span
+                                className="icon"
+                                onClick={() =>
+                                  depositHandler(
+                                    responseData.accountNo,
+                                    responseData.accountType
+                                  )
+                                }
+                              >
+                                <FontAwesomeIcon
+                                  className="cursor"
+                                  icon={faPlusSquare}
+                                />
+                                {isHovered && (
+                                  <span className="text">Deposit</span>
+                                )}
+                              </span>
+                            </li>
+
+                            <li
+                              className="icon-container"
+                              onMouseEnter={() =>
+                                setIsServiceChargeHovered(true)
+                              }
+                              onMouseLeave={() =>
+                                setIsServiceChargeHovered(false)
+                              }
+                            >
+                              <span
+                                className={`icon ${
+                                  isServiceChargeHovered ? "hovered" : ""
+                                }`}
+                                onClick={() =>
+                                  servicechargeHandler(
+                                    responseData.accountNo,
+                                    responseData.accountType
+                                  )
+                                }
+                              >
+                                <FontAwesomeIcon
+                                  icon={faMinusSquare}
+                                  className="cursor"
+                                />
+                                {isServiceChargeHovered && (
+                                  <span className="text">Service Charge</span>
+                                )}
+                              </span>
+                            </li>
+
+                            <li
+                              className="icon-container"
+                              onMouseEnter={() => setIsDeleteHovered(true)}
+                              onMouseLeave={() => setIsDeleteHovered(false)}
+                            >
+                              <span
+                                className={`icon ${
+                                  isDeleteHovered ? "hovered" : ""
+                                }`}
+                                onClick={() =>
+                                  deleteCustomerHandler(responseData.accountNo)
+                                }
+                              >
+                                <FontAwesomeIcon
+                                  icon={faTrash}
+                                  className="cursor"
+                                />
+                                {isDeleteHovered && (
+                                  <span className="text">Delete customer</span>
+                                )}
+                              </span>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+
+        {/*  */}
+        {notExist && (
+          <div style={styles.container}>
+            <div style={styles.content}>
+              <h1 style={styles.text}>Customer Does Not Exist</h1>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

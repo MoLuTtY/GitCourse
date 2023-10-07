@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SuccessAlert from "../SuccessAlert";
 import "react-toastify/dist/ReactToastify.css";
-import { toast, ToastContainer } from "react-toastify";
+import axios from "axios";
 
 const CreateCustomer = () => {
   const navigate = useNavigate("");
@@ -126,20 +126,47 @@ const CreateCustomer = () => {
 
   const handleCreateCustomerSubmit = async (e) => {
     e.preventDefault();
+
     const customerData = {
       customerName: enteredCustomerName,
       password: enteredPassword,
       dateOfBirth: enteredDob,
       pan: enteredPan,
-      initiationDate: enteredInitiationDate,
-      openingAmount: enteredOpeningAmount,
       address: enteredAddress,
     };
 
-    console.log("Customer created successfully");
     console.log(customerData);
 
-    setSuccessAlert(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/customers/create-customer",
+        customerData
+      );
+
+      if (response.status === 200) {
+        console.log("Customer created successfully");
+        console.log(customerData);
+
+        const accountData = {
+          customerId: response.data.customerId,
+          openingAmount: enteredOpeningAmount,
+          initiationDate: enteredInitiationDate,
+        };
+
+        console.log(accountData);
+
+        const accountResponse = await axios.post(
+          "http://localhost:8090/api/accounts/create-account",
+          accountData
+        );
+
+        setSuccessAlert(true);
+      } else {
+        console.error("Error creating customer:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error creating customer:", error.message);
+    }
   };
 
   const closeAlert = () => {

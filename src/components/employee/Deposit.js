@@ -12,7 +12,7 @@ const Deposit = () => {
   const location = useLocation();
 
   const accountNo = location.state && location.state.accountNo;
-
+  const accountType = location.state && location.state.accountType;
   const [enteredAmount, setAmount] = useState("");
   const [successAlert, setSuccessAlert] = useState(false);
 
@@ -20,20 +20,34 @@ const Deposit = () => {
     setAmount(event.target.value);
   };
 
-  const depositSubmitHandler = (e) => {
+  const depositSubmitHandler = async (e) => {
     e.preventDefault();
     const isConfirmed = window.confirm(
       "Are you sure you want to deposit to this account?"
     );
 
     if (isConfirmed) {
-      const depositData = {
-        amount: enteredAmount,
-      };
-      console.log("Deposit successful");
-      console.log(depositData);
-      console.log("Account No", accountNo);
-      setSuccessAlert(true);
+      // const depositData = {
+      //   amount: enteredAmount,
+      // };
+      // console.log("Deposit successful");
+      // console.log(depositData);
+      // console.log("Account No", accountNo);
+      // setSuccessAlert(true);
+
+      const response = await fetch(
+        `http://localhost:8090/api/accounts/deposit/${accountNo}/${accountType}/${enteredAmount}`,
+        {
+          method: "POST",
+        }
+      );
+
+      if (response.ok) {
+        // alert('Deposit Successful');
+        setSuccessAlert(true);
+      } else {
+        alert("Error depositing funds");
+      }
     }
   };
 

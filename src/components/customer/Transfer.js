@@ -4,16 +4,21 @@ import transfer2 from "../images/transfer2.jpg";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SuccessAlert from "../SuccessAlert";
+import axios from "axios";
+import { useEffect } from "react";
 
-const Transfer = ({ transactionData, customerData }) => {
+const Transfer = () => {
   const navigate = useNavigate("");
 
-  const [enteredFromAccount, setFromAccount] = useState("savings");
+  const [enteredFromAccount, setFromAccount] = useState("SAVINGS");
   const [enteredTargetAccount, setTargetAccount] = useState("");
   const [enteredAmount, setAmount] = useState("");
   const [successAlert, setSuccessAlert] = useState(false);
-  const [fromAccountError, setFromAccountError] = useState("");
-  const [amountError, setAmountError] = useState("");
+  // const [fromAccountError, setFromAccountError] = useState("");
+  // const [amountError, setAmountError] = useState("");
+  const [insufficientAlert, setInsufficientAlert] = useState(false);
+  const [currentBalance, setCurrentBalance] = useState("");
+  const [failureAlert, setFailureAlert] = useState(false);
 
   const fromAccountHandler = (event) => {
     setFromAccount(event.target.value);
@@ -24,8 +29,16 @@ const Transfer = ({ transactionData, customerData }) => {
   const amountHandler = (event) => {
     setAmount(event.target.value);
   };
+  useEffect(() => {
+    fetch(
+      `http://localhost:8090/api/accounts/current-balance/1000001/${enteredFromAccount}`
+    )
+      .then((response) => response.json())
+      .then((data) => setCurrentBalance(data))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
-  const transferSubmitHandler = (e) => {
+  const transferSubmitHandler = async (e) => {
     e.preventDefault();
 
     const isConfirmed = window.confirm("Are you sure you want to transfer?");
@@ -37,55 +50,70 @@ const Transfer = ({ transactionData, customerData }) => {
         amount: enteredAmount,
       };
 
-      const selectedFromAccountType = enteredFromAccount;
-      const selectedTargetAccount = parseInt(enteredTargetAccount);
-      const transferAmount = parseFloat(enteredAmount);
+      if (transferData.amount > currentBalance) {
+        setInsufficientAlert(true);
+      } else {
+        try {
+          const response = await axios.post(
+            `http://localhost:8070/api/transactions/transfer/${1000001}/${
+              transferData.fromAccount
+            }/${transferData.targetAccount}/${transferData.amount}`
+          );
 
-      const targetAccountExists = transactionData.some(
-        (transaction) => transaction.targetAccountId === selectedTargetAccount
-      );
-
-      const fromCustomer = customerData.find(
-        (c) => c.accountType === selectedFromAccountType
-      );
-
-      setFromAccountError("");
-      setAmountError("");
-
-      if (!fromCustomer) {
-        setFromAccountError("From account type not found");
+          console.log("Transfer successful");
+          console.log(response.data);
+          setSuccessAlert(true);
+        } catch (error) {
+          setFailureAlert(true);
+          console.error("Transfer failed", error);
+        }
       }
 
-      if (!targetAccountExists) {
-        setFromAccountError("Target account does not exist.");
-      }
+      // const targetAccountExists = transactionData.some(
+      //   (transaction) => transaction.targetAccountId === selectedTargetAccount
+      // );
 
-      if (transferAmount > fromCustomer.currentBalance) {
-        setAmountError("Transfer amount exceeds current balance");
-      }
+      // const fromCustomer = customerData.find(
+      //   (c) => c.accountType === selectedFromAccountType
+      // );
 
-      if (
-        targetAccountExists &&
-        transferAmount <= fromCustomer.currentBalance
-      ) {
-        console.log("Transfer successful");
-        console.log(transferData);
-        setSuccessAlert(true);
-      }
+      // setFromAccountError("");
+      // setAmountError("");
+
+      // if (!fromCustomer) {
+      //   setFromAccountError("From account type not found");
+      // }
+
+      // if (!targetAccountExists) {
+      //   setFromAccountError("Target account does not exist.");
+      // }
+
+      // if (transferAmount > fromCustomer.currentBalance) {
+      //   setAmountError("Transfer amount exceeds current balance");
+      // }
+
+      // if (
+      //   targetAccountExists &&
+      //   transferAmount <= fromCustomer.currentBalance
+      // ) {
+
+      // }
     }
   };
 
   const closeAlert = () => {
     setSuccessAlert(false);
+    setInsufficientAlert(false);
+    setFailureAlert(false);
     navigate("/customer-dashboard");
   };
 
   const transferCancelHandler = () => {
-    setFromAccount("savings");
+    setFromAccount("SAVINGS");
     setTargetAccount("");
     setAmount("");
-    setFromAccountError("");
-    setAmountError("");
+    // setFromAccountError("");
+    // setAmountError("");
   };
 
   return (
@@ -112,15 +140,15 @@ const Transfer = ({ transactionData, customerData }) => {
                       value={enteredFromAccount}
                       onChange={fromAccountHandler}
                     >
-                      <option value="savings">savings</option>
-                      <option value="current">current</option>
+                      <option value="SAVINGS">SAVINGS</option>
+                      <option value="CURRENT">CURRENT</option>
                     </select>
                   </div>
                 </div>
 
-                {fromAccountError && (
+                {/* {fromAccountError && (
                   <p className="text-danger">{fromAccountError}</p>
-                )}
+                )} */}
                 <div class="form-group mb-4">
                   <label for="inputB">Target Account</label>
                   <input
@@ -133,7 +161,7 @@ const Transfer = ({ transactionData, customerData }) => {
                     onChange={targetAccountHandler}
                   />
                 </div>
-                {amountError && <p className="text-danger">{amountError}</p>}
+                {/* {amountError && <p className="text-danger">{amountError}</p>} */}
                 <div class="form-group mb-4">
                   <label for="inputB">Amount</label>
                   <input
@@ -153,6 +181,20 @@ const Transfer = ({ transactionData, customerData }) => {
                   {successAlert && (
                     <SuccessAlert
                       message={"Transfer successful!"}
+                      onClose={closeAlert}
+                    />
+                  )}
+                  {insufficientAlert && (
+                    <SuccessAlert
+                      message={"Insufficient Fund!"}
+                      onClose={closeAlert}
+                    />
+                  )}
+                  {failureAlert && (
+                    <SuccessAlert
+                      message={
+                        "Transfer not allowed due to Minimum Balance Rule!"
+                      }
                       onClose={closeAlert}
                     />
                   )}

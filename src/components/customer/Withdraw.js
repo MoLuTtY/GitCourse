@@ -1,17 +1,21 @@
 import CustomerHeader from "./CustomerHeader";
 import "./Withdraw.css";
 import withdrawatm from "../images/withdrawatm.jpg";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import SuccessAlert from "../SuccessAlert";
+import axios from "axios";
 
-const Withdraw = ({ customerData }) => {
+const Withdraw = () => {
   const navigate = useNavigate("");
 
-  const [enteredFromAccount, setFromAccount] = useState("savings");
+  const [enteredFromAccount, setFromAccount] = useState("SAVINGS");
   const [enteredAmount, setAmount] = useState("");
   const [successAlert, setSuccessAlert] = useState(false);
+  const [failureAlert, setFailureAlert] = useState(false);
+  const [insufficientAlert, setInsufficientAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [currentBalance, setCurrentBalance] = useState("");
 
   const fromAccountHandler = (event) => {
     setFromAccount(event.target.value);
@@ -20,9 +24,16 @@ const Withdraw = ({ customerData }) => {
     setAmount(event.target.value);
   };
 
-  console.log("custome data", customerData);
+  useEffect(() => {
+    fetch(
+      `http://localhost:8090/api/accounts/current-balance/1000001/${enteredFromAccount}`
+    )
+      .then((response) => response.json())
+      .then((data) => setCurrentBalance(data))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
-  const withdrawSubmitHandler = (e) => {
+  const withdrawSubmitHandler = async (e) => {
     e.preventDefault();
 
     const isConfirmed = window.confirm("Are you sure you want to withdraw?");
@@ -31,38 +42,38 @@ const Withdraw = ({ customerData }) => {
       const selectedAccountType = enteredFromAccount;
       const withdrawalAmount = enteredAmount;
 
-      const customer = customerData.find(
-        (c) => c.accountType === selectedAccountType
-      );
+      console.log(selectedAccountType);
+      console.log(withdrawalAmount);
 
-      if (!customer) {
-        console.log("Account type not found");
-        return;
-      }
-
-      const currentBalance = customer.currentBalance;
+      // if (withdrawalAmount > currentBalance) {
+      //   setErrorMessage("Withdrawal amount exceeds current balance");
+      //   return;
+      // }
 
       if (withdrawalAmount > currentBalance) {
-        setErrorMessage("Withdrawal amount exceeds current balance");
-        return;
+        setInsufficientAlert(true);
+      } else {
+        try {
+          await axios.post(
+            `http://localhost:8090/api/accounts/withdraw/1000001/${selectedAccountType}/${withdrawalAmount}`
+          );
+
+          // setErrorMessage("");
+          setSuccessAlert(true);
+          console.log("Withdraw successful");
+        } catch (error) {
+          setFailureAlert(true);
+          console.error("Withdrawal error:", error);
+          console.log("Response data:", error.response.data);
+        }
       }
-
-      const withdrawData = {
-        fromAccount: enteredFromAccount,
-        amount: enteredAmount,
-      };
-
-      setErrorMessage("");
-
-      console.log("Withdraw successful");
-      console.log(withdrawData);
-
-      setSuccessAlert(true);
     }
   };
 
   const closeAlert = () => {
     setSuccessAlert(false);
+    setFailureAlert(false);
+    setInsufficientAlert(false);
     navigate("/customer-dashboard");
   };
 
@@ -95,12 +106,12 @@ const Withdraw = ({ customerData }) => {
                       value={enteredFromAccount}
                       onChange={fromAccountHandler}
                     >
-                      <option value="savings">savings</option>
-                      <option value="current">current</option>
+                      <option value="SAVINGS">SAVINGS</option>
+                      <option value="CURRENT">CURRENT</option>
                     </select>
                   </div>
                 </div>
-                {errorMessage && <p className="text-danger">{errorMessage}</p>}
+                {/* {errorMessage && <p className="text-danger">{errorMessage}</p>} */}
                 <div class="form-group mb-4">
                   <label for="inputB">Amount</label>
                   <input
@@ -121,6 +132,22 @@ const Withdraw = ({ customerData }) => {
                   {successAlert && (
                     <SuccessAlert
                       message={"Withdrawal successful!"}
+                      onClose={closeAlert}
+                    />
+                  )}
+
+                  {failureAlert && (
+                    <SuccessAlert
+                      message={
+                        "Withdrawal not allowed due to Minimum Balance Rule!"
+                      }
+                      onClose={closeAlert}
+                    />
+                  )}
+
+                  {insufficientAlert && (
+                    <SuccessAlert
+                      message={"Insufficient Fund!"}
                       onClose={closeAlert}
                     />
                   )}

@@ -2,49 +2,63 @@ import CustomerHeader from "./CustomerHeader";
 import "./Transactions.css";
 import transactions2 from "../images/transactions2.jpg";
 import { useState, useEffect } from "react";
+import axios from "axios";
 
-const Transactions = ({ transactionData, customerData }) => {
+const Transactions = () => {
   const [enteredFromDate, setFromDate] = useState("");
   const [enteredToDate, setToDate] = useState("");
   const [filteredTransactions, setFilteredTransactions] = useState([]);
-  const [showTableHead, setShowTableHead] = useState(false);
-  const [searchPerformed, setSearchPerformed] = useState(false);
-
-  useEffect(() => {
-    setSearchPerformed(true);
-
-    const sortedTransactions = transactionData
-      .slice()
-      .sort((a, b) => new Date(b.initiationDate) - new Date(a.initiationDate));
-
-    setFilteredTransactions(sortedTransactions);
-    setShowTableHead(true);
-  }, []);
+  const [transactions, setTransactions] = useState([]);
+  const [showTransaction, setShowTransaction] = useState(true);
+  const [showFilter, setShowFilter] = useState(false);
 
   const dateFromHandler = (event) => {
     setFromDate(event.target.value);
   };
+
   const dateToHandler = (event) => {
     setToDate(event.target.value);
   };
 
+  useEffect(() => {
+    axios
+      .get(`http://localhost:8070/api/transactions/get-transactions/10357700`)
+      .then((response) => {
+        if (Array.isArray(response.data)) {
+          setTransactions(response.data);
+        } else {
+          setTransactions([response.data]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching customer data:", error);
+      });
+  }, []);
+
   const viewTransactionsHandler = (e) => {
     e.preventDefault();
-    const fromDate = new Date(enteredFromDate);
-    const toDate = new Date(enteredToDate);
 
-    const filtered = transactionData.filter((transaction) => {
-      const transactionDate = new Date(transaction.initiationDate);
-      return transactionDate >= fromDate && transactionDate <= toDate;
-    });
+    setShowTransaction(false);
+    setFilteredTransactions([]);
 
-    const sortedFiltered = filtered
-      .slice()
-      .sort((a, b) => new Date(b.initiationDate) - new Date(a.initiationDate));
+    axios
+      .get(
+        `http://localhost:8070/api/transactions/get-transactions/10357700/${enteredFromDate}/${enteredToDate}`
+      )
+      .then((response) => {
+        if (Array.isArray(response.data)) {
+          setFilteredTransactions(response.data);
+        } else {
+          setFilteredTransactions([response.data]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching filtered transactions:", error);
+      });
 
-    setShowTableHead(true);
-    setFilteredTransactions(sortedFiltered);
-    setSearchPerformed(true);
+    console.log("filtered ", filteredTransactions);
+
+    setShowFilter(true);
   };
 
   const containerStyle = {
@@ -88,7 +102,8 @@ const Transactions = ({ transactionData, customerData }) => {
                     class="form-control "
                     required
                     placeholder="Account Number"
-                    value={customerData[0].accountNo}
+                    // value={customerData[0].accountNo}
+                    value={10357700}
                     disabled
                     style={{ color: "#999" }}
                   />
@@ -119,25 +134,44 @@ const Transactions = ({ transactionData, customerData }) => {
 
             <div className="table-responsive table-container mt-5">
               <table className="table table-bordered text-center table-striped">
-                {showTableHead && filteredTransactions.length > 0 && (
-                  <thead>
-                    <tr>
-                      <th>Source Account Type</th>
-                      <th>Target Account ID</th>
-                      <th>Amount</th>
-                      <th>Initiation Date</th>
-                    </tr>
-                  </thead>
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Source Account</th>
+                    <th>Target Account</th>
+                    <th>Withdraw</th>
+                    <th>Transfer</th>
+                    <th>Deposit</th>
+                    <th>Closing Balance</th>
+                  </tr>
+                </thead>
+                {showTransaction && (
+                  <tbody>
+                    {transactions.map((transaction, index) => (
+                      <tr key={index}>
+                        <td>{transaction.transactionDate}</td>
+                        <td>{transaction.sourceAccountType}</td>
+                        <td>{transaction.targetAccountNo}</td>
+                        <td>{transaction.withdrawalAmount}</td>
+                        <td>{transaction.transferAmount}</td>
+                        <td>{transaction.depositAmount}</td>
+                        <td>&#x20B9;{transaction.closingBalance}</td>
+                      </tr>
+                    ))}
+                  </tbody>
                 )}
 
-                {filteredTransactions.length > 0 && (
+                {showFilter && (
                   <tbody>
                     {filteredTransactions.map((transaction, index) => (
                       <tr key={index}>
+                        <td>{transaction.transactionDate}</td>
                         <td>{transaction.sourceAccountType}</td>
-                        <td>{transaction.targetAccountId}</td>
-                        <td>&#x20B9;{transaction.amount}</td>
-                        <td>{transaction.initiationDate}</td>
+                        <td>{transaction.targetAccountNo}</td>
+                        <td>{transaction.withdrawalAmount}</td>
+                        <td>{transaction.transferAmount}</td>
+                        <td>{transaction.depositAmount}</td>
+                        <td>&#x20B9;{transaction.closingBalance}</td>
                       </tr>
                     ))}
                   </tbody>

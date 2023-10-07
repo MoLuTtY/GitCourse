@@ -6,6 +6,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import SuccessAlert from "../SuccessAlert";
 import { useState } from "react";
 import NoServiceChargeAlert from "../NoServiceChargeAlert";
+import ServiceChargeAlreadyDeducted from "../ServiceChargeAlreadyDeducted";
+import axios from "axios";
 
 const ServiceCharge = ({ customerData }) => {
   const navigate = useNavigate("");
@@ -20,7 +22,9 @@ const ServiceCharge = ({ customerData }) => {
 
   const [successAlert, setSuccessAlert] = useState(false);
   const [noServiceChargeAlert, setNoServiceChargeAlert] = useState(false);
-  const deductServiceChargeHandler = (e) => {
+  const [deductedAlert, setDeductedAlert] = useState(false);
+
+  const deductServiceChargeHandler = async (e) => {
     e.preventDefault();
 
     const isConfirmed = window.confirm(
@@ -29,24 +33,35 @@ const ServiceCharge = ({ customerData }) => {
 
     if (isConfirmed) {
       console.log("Searching for customer...");
-      const customer = customerData.find(
-        (customer) =>
-          customer.accountNo === accountNo &&
-          customer.accountType === accountType
-      );
 
-      if (customer) {
-        console.log("Customer found:", customer);
-        if (customer.currentBalance < 1000) {
-          console.log("Service charge deducted : Rs.100");
-          console.log("Account No", accountNo);
-          setSuccessAlert(true);
+      try {
+        const response = await axios.get(
+          `http://localhost:8060/api/rules/service-charge/${accountNo}/${accountType}`
+        );
+
+        if (response.status === 200) {
+          const responseData = response.data;
+          console.log("Response from server:", responseData);
+
+          if (responseData.serviceCharge === 100) {
+            console.log("Service charge deducted: Rs.100");
+            console.log("Account No", accountNo);
+            setSuccessAlert(true);
+          } else if (
+            responseData.serviceCharge === 0 &&
+            responseData.reference === "Already deducted"
+          ) {
+            console.log("service charge already deducted");
+            setDeductedAlert(true);
+          } else {
+            console.log("No service charge");
+            setNoServiceChargeAlert(true);
+          }
         } else {
-          console.log("No service charge");
-          setNoServiceChargeAlert(true);
+          console.error("Server responded with an error:", response.status);
         }
-      } else {
-        console.log("Customer not found with account number", accountNo);
+      } catch (error) {
+        console.error("Error while making the request:", error);
       }
     }
   };
@@ -54,6 +69,7 @@ const ServiceCharge = ({ customerData }) => {
   const closeAlert = () => {
     setSuccessAlert(false);
     setNoServiceChargeAlert(false);
+    setDeductedAlert(false);
     navigate("/view-customer");
   };
 
@@ -82,13 +98,19 @@ const ServiceCharge = ({ customerData }) => {
                   </button>
                   {successAlert && (
                     <SuccessAlert
-                      message="Service charge deducted successfully!"
+                      message="Service charge Rs.100 deducted successfully!"
                       onClose={closeAlert}
                     />
                   )}
                   {noServiceChargeAlert && (
                     <NoServiceChargeAlert
                       message="Great News! No Service Charge Deduction Required "
+                      onClose={closeAlert}
+                    />
+                  )}
+                  {deductedAlert && (
+                    <ServiceChargeAlreadyDeducted
+                      message="Service charge already deducted for this Month ! "
                       onClose={closeAlert}
                     />
                   )}
