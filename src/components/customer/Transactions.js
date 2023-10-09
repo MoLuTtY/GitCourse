@@ -3,6 +3,7 @@ import "./Transactions.css";
 import transactions2 from "../images/transactions2.jpg";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 const Transactions = () => {
   const [enteredFromDate, setFromDate] = useState("");
@@ -11,6 +12,12 @@ const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [showTransaction, setShowTransaction] = useState(true);
   const [showFilter, setShowFilter] = useState(false);
+
+  const location = useLocation();
+  const customerId = location.state && location.state.customerId;
+  const accountNo = location.state && location.state.accountNo;
+  console.log("from trans", customerId);
+  // console.log(typeof customerId);
 
   const dateFromHandler = (event) => {
     setFromDate(event.target.value);
@@ -21,19 +28,24 @@ const Transactions = () => {
   };
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:8070/api/transactions/get-transactions/10357700`)
-      .then((response) => {
-        if (Array.isArray(response.data)) {
-          setTransactions(response.data);
-        } else {
-          setTransactions([response.data]);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching customer data:", error);
-      });
-  }, []);
+    if (customerId != null) {
+      axios
+        .get(
+          `http://localhost:8070/api/transactions/get-transactions/${customerId}`
+        )
+        .then((response) => {
+          if (Array.isArray(response.data)) {
+            setTransactions(response.data);
+          } else {
+            setTransactions([response.data]);
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching customer data:", error);
+        });
+    }
+  }, [customerId]);
+  console.log("transactions", transactions);
 
   const viewTransactionsHandler = (e) => {
     e.preventDefault();
@@ -42,8 +54,9 @@ const Transactions = () => {
     setFilteredTransactions([]);
 
     axios
+
       .get(
-        `http://localhost:8070/api/transactions/get-transactions/10357700/${enteredFromDate}/${enteredToDate}`
+        `http://localhost:8070/api/transactions/get-transactions/${customerId}/${enteredFromDate}/${enteredToDate}`
       )
       .then((response) => {
         if (Array.isArray(response.data)) {
@@ -102,8 +115,7 @@ const Transactions = () => {
                     class="form-control "
                     required
                     placeholder="Account Number"
-                    // value={customerData[0].accountNo}
-                    value={10357700}
+                    value={accountNo}
                     disabled
                     style={{ color: "#999" }}
                   />

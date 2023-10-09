@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import SuccessAlert from "../SuccessAlert";
 import axios from "axios";
 import { useEffect } from "react";
-
+import { useLocation } from "react-router-dom";
 const Transfer = () => {
   const navigate = useNavigate("");
 
@@ -14,11 +14,14 @@ const Transfer = () => {
   const [enteredTargetAccount, setTargetAccount] = useState("");
   const [enteredAmount, setAmount] = useState("");
   const [successAlert, setSuccessAlert] = useState(false);
-  // const [fromAccountError, setFromAccountError] = useState("");
-  // const [amountError, setAmountError] = useState("");
+
   const [insufficientAlert, setInsufficientAlert] = useState(false);
   const [currentBalance, setCurrentBalance] = useState("");
   const [failureAlert, setFailureAlert] = useState(false);
+
+  const location = useLocation();
+  const accountNo = location.state && location.state.accountNo;
+  console.log("from transafer", accountNo);
 
   const fromAccountHandler = (event) => {
     setFromAccount(event.target.value);
@@ -31,7 +34,7 @@ const Transfer = () => {
   };
   useEffect(() => {
     fetch(
-      `http://localhost:8090/api/accounts/current-balance/1000001/${enteredFromAccount}`
+      `http://localhost:8090/api/accounts/current-balance/${accountNo}/${enteredFromAccount}`
     )
       .then((response) => response.json())
       .then((data) => setCurrentBalance(data))
@@ -55,9 +58,7 @@ const Transfer = () => {
       } else {
         try {
           const response = await axios.post(
-            `http://localhost:8070/api/transactions/transfer/${1000001}/${
-              transferData.fromAccount
-            }/${transferData.targetAccount}/${transferData.amount}`
+            `http://localhost:8070/api/transactions/transfer/${accountNo}/${transferData.fromAccount}/${transferData.targetAccount}/${transferData.amount}`
           );
 
           console.log("Transfer successful");

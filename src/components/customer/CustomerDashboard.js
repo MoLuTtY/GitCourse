@@ -5,20 +5,21 @@ import transactions from "../images/transactions.jpg";
 import transfer from "../images/transfer.jpg";
 import withdraw from "../images/withdraw.jpg";
 
-const CustomerDashboard = () => {
+const CustomerDashboard = ({ customerId, accountNo }) => {
   const navigate = useNavigate();
+
   const navigateToProfile = () => {
-    navigate("/customer-profile");
+    navigate("/customer-profile", { state: { customerId } });
   };
   const navigateToTransactions = () => {
-    navigate("/customer-transactions");
+    navigate("/customer-transactions", { state: { customerId, accountNo } });
   };
 
   const navigateToWithdraw = () => {
-    navigate("/customer-withdraw");
+    navigate("/customer-withdraw", { state: { accountNo } });
   };
   const navigateToTransfer = () => {
-    navigate("/customer-transfer");
+    navigate("/customer-transfer", { state: { accountNo } });
   };
   return (
     <div>

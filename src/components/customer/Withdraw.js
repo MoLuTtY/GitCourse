@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import SuccessAlert from "../SuccessAlert";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 const Withdraw = () => {
   const navigate = useNavigate("");
@@ -17,6 +18,11 @@ const Withdraw = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [currentBalance, setCurrentBalance] = useState("");
 
+  const location = useLocation();
+  const accountNo = location.state && location.state.accountNo;
+
+  console.log("from withdraw", accountNo);
+
   const fromAccountHandler = (event) => {
     setFromAccount(event.target.value);
   };
@@ -26,7 +32,7 @@ const Withdraw = () => {
 
   useEffect(() => {
     fetch(
-      `http://localhost:8090/api/accounts/current-balance/1000001/${enteredFromAccount}`
+      `http://localhost:8090/api/accounts/current-balance/${accountNo}/${enteredFromAccount}`
     )
       .then((response) => response.json())
       .then((data) => setCurrentBalance(data))
@@ -55,7 +61,7 @@ const Withdraw = () => {
       } else {
         try {
           await axios.post(
-            `http://localhost:8090/api/accounts/withdraw/1000001/${selectedAccountType}/${withdrawalAmount}`
+            `http://localhost:8090/api/accounts/withdraw/${accountNo}/${selectedAccountType}/${withdrawalAmount}`
           );
 
           // setErrorMessage("");

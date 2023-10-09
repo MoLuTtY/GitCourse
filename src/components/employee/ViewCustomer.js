@@ -11,7 +11,7 @@ import {
   faPlusSquare,
 } from "@fortawesome/free-solid-svg-icons";
 
-const ViewCustomer = ({ customerData }) => {
+const ViewCustomer = () => {
   const navigate = useNavigate();
   const [enteredAccountNo, setAccountNo] = useState("");
   const [enteredAccountType, setAccountType] = useState("SAVINGS");

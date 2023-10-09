@@ -2,12 +2,15 @@ import CustomerHeader from "./CustomerHeader";
 import "./Profile.css";
 import React, { useState } from "react";
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const Profile = () => {
   const [customerData, setCustomerData] = useState([]);
-
+  const location = useLocation();
+  const customerId = location.state && location.state.customerId;
+  console.log("profile", customerId);
   useEffect(() => {
-    fetch(`http://localhost:8080/api/customers/view-customer/98987788`)
+    fetch(`http://localhost:8080/api/customers/view-customer/${customerId}`)
       .then((response) => response.json())
       .then((data) => setCustomerData(data))
       .catch((error) => console.error("Error fetching data:", error));
