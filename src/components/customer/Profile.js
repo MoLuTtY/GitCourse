@@ -8,14 +8,14 @@ const Profile = () => {
   const [customerData, setCustomerData] = useState([]);
   const location = useLocation();
   const customerId = location.state && location.state.customerId;
-  console.log("profile", customerId);
+
   useEffect(() => {
     fetch(`http://localhost:8080/api/customers/view-customer/${customerId}`)
       .then((response) => response.json())
       .then((data) => setCustomerData(data))
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
-  console.log(customerData);
+
   return (
     <div>
       <CustomerHeader></CustomerHeader>

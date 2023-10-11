@@ -16,8 +16,6 @@ const Transactions = () => {
   const location = useLocation();
   const customerId = location.state && location.state.customerId;
   const accountNo = location.state && location.state.accountNo;
-  console.log("from trans", customerId);
-  // console.log(typeof customerId);
 
   const dateFromHandler = (event) => {
     setFromDate(event.target.value);
@@ -45,7 +43,6 @@ const Transactions = () => {
         });
     }
   }, [customerId]);
-  console.log("transactions", transactions);
 
   const viewTransactionsHandler = (e) => {
     e.preventDefault();
@@ -68,8 +65,6 @@ const Transactions = () => {
       .catch((error) => {
         console.error("Error fetching filtered transactions:", error);
       });
-
-    console.log("filtered ", filteredTransactions);
 
     setShowFilter(true);
   };

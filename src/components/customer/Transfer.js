@@ -21,7 +21,6 @@ const Transfer = () => {
 
   const location = useLocation();
   const accountNo = location.state && location.state.accountNo;
-  console.log("from transafer", accountNo);
 
   const fromAccountHandler = (event) => {
     setFromAccount(event.target.value);
@@ -61,44 +60,11 @@ const Transfer = () => {
             `http://localhost:8070/api/transactions/transfer/${accountNo}/${transferData.fromAccount}/${transferData.targetAccount}/${transferData.amount}`
           );
 
-          console.log("Transfer successful");
-          console.log(response.data);
           setSuccessAlert(true);
         } catch (error) {
           setFailureAlert(true);
-          console.error("Transfer failed", error);
         }
       }
-
-      // const targetAccountExists = transactionData.some(
-      //   (transaction) => transaction.targetAccountId === selectedTargetAccount
-      // );
-
-      // const fromCustomer = customerData.find(
-      //   (c) => c.accountType === selectedFromAccountType
-      // );
-
-      // setFromAccountError("");
-      // setAmountError("");
-
-      // if (!fromCustomer) {
-      //   setFromAccountError("From account type not found");
-      // }
-
-      // if (!targetAccountExists) {
-      //   setFromAccountError("Target account does not exist.");
-      // }
-
-      // if (transferAmount > fromCustomer.currentBalance) {
-      //   setAmountError("Transfer amount exceeds current balance");
-      // }
-
-      // if (
-      //   targetAccountExists &&
-      //   transferAmount <= fromCustomer.currentBalance
-      // ) {
-
-      // }
     }
   };
 
@@ -113,8 +79,6 @@ const Transfer = () => {
     setFromAccount("SAVINGS");
     setTargetAccount("");
     setAmount("");
-    // setFromAccountError("");
-    // setAmountError("");
   };
 
   return (
@@ -147,9 +111,6 @@ const Transfer = () => {
                   </div>
                 </div>
 
-                {/* {fromAccountError && (
-                  <p className="text-danger">{fromAccountError}</p>
-                )} */}
                 <div class="form-group mb-4">
                   <label for="inputB">Target Account</label>
                   <input
@@ -162,7 +123,7 @@ const Transfer = () => {
                     onChange={targetAccountHandler}
                   />
                 </div>
-                {/* {amountError && <p className="text-danger">{amountError}</p>} */}
+
                 <div class="form-group mb-4">
                   <label for="inputB">Amount</label>
                   <input

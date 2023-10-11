@@ -40,8 +40,6 @@ const CreateAccount = () => {
       accountType: enteredAccountType,
       ownerName: enteredOwnerName,
     };
-    console.log("Account created successfully");
-    console.log(accountDate);
 
     setSuccessAlert(true);
   };

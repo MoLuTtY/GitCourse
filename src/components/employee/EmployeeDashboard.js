@@ -1,10 +1,12 @@
 import "./EmployeeDashboard.css";
 import { Link, useNavigate } from "react-router-dom";
 import createCustomer from "../images/createCustomer.jpg";
-import createAccount from "../images/createAccount.jpg";
 import viewCustomer from "../images/viewCustomer.jpg";
 
 const EmployeeDashboard = () => {
+  const storedToken = localStorage.getItem("token");
+  console.log(storedToken);
+
   const navigate = useNavigate();
   const navigateToCreateCustomer = () => {
     navigate("/create-customer");
@@ -52,21 +54,7 @@ const EmployeeDashboard = () => {
               </button>
             </div>
           </div>
-          {/* <div className="col-sm-4">
-            <div className="border custom-border border-3 text-white p-3">
-              <img
-                className="img-fluid"
-                src={createAccount}
-                alt="create account"
-              />
-              <button
-                className="btn btn-primary w-100 mt-auto mt-5"
-                onClick={navigateToCreateAccount}
-              >
-                Create Account
-              </button>
-            </div>
-          </div> */}
+
           <div className="col-sm-4">
             <div className="border custom-border border-3 text-white p-3">
               <img

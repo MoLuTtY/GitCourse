@@ -21,8 +21,6 @@ const Withdraw = () => {
   const location = useLocation();
   const accountNo = location.state && location.state.accountNo;
 
-  console.log("from withdraw", accountNo);
-
   const fromAccountHandler = (event) => {
     setFromAccount(event.target.value);
   };
@@ -48,14 +46,6 @@ const Withdraw = () => {
       const selectedAccountType = enteredFromAccount;
       const withdrawalAmount = enteredAmount;
 
-      console.log(selectedAccountType);
-      console.log(withdrawalAmount);
-
-      // if (withdrawalAmount > currentBalance) {
-      //   setErrorMessage("Withdrawal amount exceeds current balance");
-      //   return;
-      // }
-
       if (withdrawalAmount > currentBalance) {
         setInsufficientAlert(true);
       } else {
@@ -64,13 +54,10 @@ const Withdraw = () => {
             `http://localhost:8090/api/accounts/withdraw/${accountNo}/${selectedAccountType}/${withdrawalAmount}`
           );
 
-          // setErrorMessage("");
           setSuccessAlert(true);
           console.log("Withdraw successful");
         } catch (error) {
           setFailureAlert(true);
-          console.error("Withdrawal error:", error);
-          console.log("Response data:", error.response.data);
         }
       }
     }
@@ -117,7 +104,7 @@ const Withdraw = () => {
                     </select>
                   </div>
                 </div>
-                {/* {errorMessage && <p className="text-danger">{errorMessage}</p>} */}
+
                 <div class="form-group mb-4">
                   <label for="inputB">Amount</label>
                   <input
