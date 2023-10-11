@@ -8,9 +8,14 @@ const Profile = () => {
   const [customerData, setCustomerData] = useState([]);
   const location = useLocation();
   const customerId = location.state && location.state.customerId;
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/customers/view-customer/${customerId}`)
+    fetch(`http://localhost:8080/api/customers/view-customer/${customerId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((response) => response.json())
       .then((data) => setCustomerData(data))
       .catch((error) => console.error("Error fetching data:", error));

@@ -25,6 +25,7 @@ import { useEffect } from "react";
 function App() {
   const [customerId, setCustomerId] = useState(null);
   const [accountNo, setAccountNo] = useState(null);
+  const token = localStorage.getItem("token");
 
   const onLogin = (customerId) => {
     setCustomerId(customerId);
@@ -33,7 +34,12 @@ function App() {
   useEffect(() => {
     if (customerId !== null) {
       fetch(
-        `http://localhost:8090/api/accounts/find-savings-accounts/${customerId}`
+        `http://localhost:8090/api/accounts/find-savings-accounts/${customerId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       )
         .then((response) => response.json())
         .then((data) => {

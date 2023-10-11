@@ -27,6 +27,8 @@ const CreateCustomer = () => {
   const [isOpeningAmountValid, setIsOpeningAmountValid] = useState(true);
   const [isAddressValid, setIsAddressValid] = useState(true);
 
+  const token = localStorage.getItem("token");
+
   const customerNameChangeHandler = (event) => {
     const inputValue = event.target.value;
     const namePattern = /^[A-Za-z\s]+$/;
@@ -140,7 +142,12 @@ const CreateCustomer = () => {
     try {
       const response = await axios.post(
         "http://localhost:8080/api/customers/create-customer",
-        customerData
+        customerData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       if (response.status === 200) {
@@ -157,7 +164,12 @@ const CreateCustomer = () => {
 
         const accountResponse = await axios.post(
           "http://localhost:8090/api/accounts/create-account",
-          accountData
+          accountData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         setSuccessAlert(true);

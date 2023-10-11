@@ -15,12 +15,18 @@ const DeleteCustomer = () => {
   const accountNo = location.state && location.state.accountNo;
   const [successAlert, setSuccessAlert] = useState(false);
   const [customerId, setCustomerId] = useState("");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchCustomerId = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8090/api/accounts/get-customerId/${accountNo}`
+          `http://localhost:8090/api/accounts/get-customerId/${accountNo}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const data = response.data;
         setCustomerId(data);
@@ -31,14 +37,6 @@ const DeleteCustomer = () => {
 
     fetchCustomerId();
   }, [accountNo]);
-
-  // const deleteCustomerSubmitHandler = (e) => {
-  //   e.preventDefault();
-
-  //   const isConfirmed = window.confirm(
-  //     "Are you sure you want to delete this customer?"
-  //   );
-  // };
 
   const deleteCustomerSubmitHandler = async (e) => {
     e.preventDefault();
@@ -51,7 +49,12 @@ const DeleteCustomer = () => {
       console.log(customerId);
       try {
         await axios.delete(
-          `http://localhost:8080/api/customers/delete-customer/${customerId}`
+          `http://localhost:8080/api/customers/delete-customer/${customerId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setSuccessAlert(true);
       } catch (error) {

@@ -21,6 +21,7 @@ const Transfer = () => {
 
   const location = useLocation();
   const accountNo = location.state && location.state.accountNo;
+  const token = localStorage.getItem("token");
 
   const fromAccountHandler = (event) => {
     setFromAccount(event.target.value);
@@ -33,7 +34,12 @@ const Transfer = () => {
   };
   useEffect(() => {
     fetch(
-      `http://localhost:8090/api/accounts/current-balance/${accountNo}/${enteredFromAccount}`
+      `http://localhost:8090/api/accounts/current-balance/${accountNo}/${enteredFromAccount}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     )
       .then((response) => response.json())
       .then((data) => setCurrentBalance(data))
@@ -57,7 +63,13 @@ const Transfer = () => {
       } else {
         try {
           const response = await axios.post(
-            `http://localhost:8070/api/transactions/transfer/${accountNo}/${transferData.fromAccount}/${transferData.targetAccount}/${transferData.amount}`
+            `http://localhost:8070/api/transactions/transfer/${accountNo}/${transferData.fromAccount}/${transferData.targetAccount}/${transferData.amount}`,
+            null,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
           );
 
           setSuccessAlert(true);

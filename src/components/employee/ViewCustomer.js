@@ -25,9 +25,16 @@ const ViewCustomer = () => {
   const [searchCustomerTable, setSearchCustomerTable] = useState(false);
   const [notExist, setnotExist] = useState(false);
 
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
     fetch(
-      "http://localhost:8080/api/customers/allCustomers-with-savings-account"
+      "http://localhost:8080/api/customers/allCustomers-with-savings-account",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     )
       .then((response) => response.json())
       .then((data) => {
@@ -55,7 +62,11 @@ const ViewCustomer = () => {
 
     try {
       const apiUrl = `http://localhost:8080/api/customers/search-customer/${enteredAccountNo}/${enteredAccountType}`;
-      const response = await axios.get(apiUrl);
+      const response = await axios.get(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.status !== 200) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -81,7 +92,6 @@ const ViewCustomer = () => {
   };
 
   const depositHandler = (accountNo, accountType) => {
-    // navigate("/deposit", { state: { accountNo, accountType } });
     navigate("/deposit", {
       state: { accountNo, accountType },
     });

@@ -13,6 +13,8 @@ const Transactions = () => {
   const [showTransaction, setShowTransaction] = useState(true);
   const [showFilter, setShowFilter] = useState(false);
 
+  const token = localStorage.getItem("token");
+
   const location = useLocation();
   const customerId = location.state && location.state.customerId;
   const accountNo = location.state && location.state.accountNo;
@@ -29,7 +31,12 @@ const Transactions = () => {
     if (customerId != null) {
       axios
         .get(
-          `http://localhost:8070/api/transactions/get-transactions/${customerId}`
+          `http://localhost:8070/api/transactions/get-transactions/${customerId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         )
         .then((response) => {
           if (Array.isArray(response.data)) {
@@ -53,7 +60,12 @@ const Transactions = () => {
     axios
 
       .get(
-        `http://localhost:8070/api/transactions/get-transactions/${customerId}/${enteredFromDate}/${enteredToDate}`
+        `http://localhost:8070/api/transactions/get-transactions/${customerId}/${enteredFromDate}/${enteredToDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       )
       .then((response) => {
         if (Array.isArray(response.data)) {

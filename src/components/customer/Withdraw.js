@@ -2,7 +2,7 @@ import CustomerHeader from "./CustomerHeader";
 import "./Withdraw.css";
 import withdrawatm from "../images/withdrawatm.jpg";
 import { useState, useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import SuccessAlert from "../SuccessAlert";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
@@ -20,6 +20,7 @@ const Withdraw = () => {
 
   const location = useLocation();
   const accountNo = location.state && location.state.accountNo;
+  const token = localStorage.getItem("token");
 
   const fromAccountHandler = (event) => {
     setFromAccount(event.target.value);
@@ -30,12 +31,18 @@ const Withdraw = () => {
 
   useEffect(() => {
     fetch(
-      `http://localhost:8090/api/accounts/current-balance/${accountNo}/${enteredFromAccount}`
+      `http://localhost:8090/api/accounts/current-balance/${accountNo}/${enteredFromAccount}`,
+
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     )
       .then((response) => response.json())
       .then((data) => setCurrentBalance(data))
       .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+  });
 
   const withdrawSubmitHandler = async (e) => {
     e.preventDefault();
@@ -51,7 +58,13 @@ const Withdraw = () => {
       } else {
         try {
           await axios.post(
-            `http://localhost:8090/api/accounts/withdraw/${accountNo}/${selectedAccountType}/${withdrawalAmount}`
+            `http://localhost:8090/api/accounts/withdraw/${accountNo}/${selectedAccountType}/${withdrawalAmount}`,
+            null,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
           );
 
           setSuccessAlert(true);

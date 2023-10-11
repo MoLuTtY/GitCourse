@@ -16,6 +16,8 @@ const Deposit = () => {
   const [enteredAmount, setAmount] = useState("");
   const [successAlert, setSuccessAlert] = useState(false);
 
+  const token = localStorage.getItem("token");
+
   const amountHandler = (event) => {
     setAmount(event.target.value);
   };
@@ -27,23 +29,17 @@ const Deposit = () => {
     );
 
     if (isConfirmed) {
-      // const depositData = {
-      //   amount: enteredAmount,
-      // };
-      // console.log("Deposit successful");
-      // console.log(depositData);
-      // console.log("Account No", accountNo);
-      // setSuccessAlert(true);
-
       const response = await fetch(
         `http://localhost:8090/api/accounts/deposit/${accountNo}/${accountType}/${enteredAmount}`,
         {
           method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
       if (response.ok) {
-        // alert('Deposit Successful');
         setSuccessAlert(true);
       } else {
         alert("Error depositing funds");

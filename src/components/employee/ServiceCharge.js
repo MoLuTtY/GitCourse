@@ -15,10 +15,7 @@ const ServiceCharge = ({ customerData }) => {
 
   const accountNo = location.state && location.state.accountNo;
   const accountType = location.state && location.state.accountType;
-  console.log("from service charge");
-  console.log(customerData);
-  console.log(accountNo);
-  console.log(accountType);
+  const token = localStorage.getItem("token");
 
   const [successAlert, setSuccessAlert] = useState(false);
   const [noServiceChargeAlert, setNoServiceChargeAlert] = useState(false);
@@ -36,7 +33,12 @@ const ServiceCharge = ({ customerData }) => {
 
       try {
         const response = await axios.get(
-          `http://localhost:8060/api/rules/service-charge/${accountNo}/${accountType}`
+          `http://localhost:8060/api/rules/service-charge/${accountNo}/${accountType}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
         if (response.status === 200) {
