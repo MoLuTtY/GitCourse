@@ -21,6 +21,7 @@ import {
   Link,
 } from "react-router-dom";
 import { useEffect } from "react";
+import Logout from "./components/Logout";
 
 function App() {
   const [customerId, setCustomerId] = useState(null);
@@ -69,12 +70,10 @@ function App() {
         <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
         <Route path="/create-customer" element={<CreateCustomer />} />
         <Route path="/view-customer" element={<ViewCustomer />} />
-
         <Route path="/deposit" element={<Deposit />} />
         <Route path="/service-charge" element={<ServiceCharge />} />
         <Route path="/delete-customer" element={<DeleteCustomer />} />
-
-        <Route path="/logout" element={<Login onLogin={onLogin} />} />
+        <Route path="/logout" element={<Logout />} />
         <Route path="*" element={<Error />} />
       </Routes>
     </Router>
