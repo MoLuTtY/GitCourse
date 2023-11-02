@@ -12,17 +12,21 @@ import Deposit from "./components/employee/Deposit";
 import ServiceCharge from "./components/employee/ServiceCharge";
 import DeleteCustomer from "./components/employee/DeleteCustomer";
 import Error from "./components/Error";
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useEffect } from "react";
 import Logout from "./components/Logout";
 
 function App() {
+  const [customerId, setCustomerId] = useState(null);
   const token = localStorage.getItem("token");
-  const customerId = localStorage.getItem("customerId");
+
+  const onLogin = (customerId) => {
+    setCustomerId(customerId);
+  };
 
   useEffect(() => {
-    if (customerId !== null) {
+    if (customerId !== null && token != null) {
       fetch(
         `http://localhost:8090/api/accounts/find-savings-accounts/${customerId}`,
         {
@@ -45,7 +49,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Welcome />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login onLogin={onLogin} />} />
         <Route path="/customer-dashboard" element={<CustomerDashboard />} />
         <Route path="/customer-profile" element={<Profile />} />
         <Route path="/customer-transactions" element={<Transactions />} />

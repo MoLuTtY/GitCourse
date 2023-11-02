@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import login from "../components/images/login.jpeg";
 import axios from "axios";
 
-const Login = () => {
+const Login = ({ onLogin }) => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -30,6 +30,7 @@ const Login = () => {
         navigate("/employee-dashboard");
       } else if (response.data.role === "CUSTOMER") {
         localStorage.setItem("customerId", response.data.userid);
+        onLogin(response.data.userid);
         navigate("/customer-dashboard");
       }
     } catch (error) {
