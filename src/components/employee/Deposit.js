@@ -2,10 +2,11 @@ import EmployeeHeader from "./EmployeeHeader";
 import "./Deposit.css";
 import ViewCustomerHeader from "./ViewCustomerHeader";
 import deposit2 from "../images/deposit2.jpg";
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import SuccessAlert from "../SuccessAlert";
 import { useLocation } from "react-router-dom";
+import useTokenExpire from "../useTokenExpire";
 
 const Deposit = () => {
   const navigate = useNavigate("");
@@ -17,6 +18,7 @@ const Deposit = () => {
   const [successAlert, setSuccessAlert] = useState(false);
 
   const token = localStorage.getItem("token");
+  useTokenExpire();
 
   const amountHandler = (event) => {
     setAmount(event.target.value);
@@ -56,34 +58,34 @@ const Deposit = () => {
     setAmount("");
   };
   return (
-    <div>
+    <>
       <ViewCustomerHeader></ViewCustomerHeader>
-      <div class="container mt-5">
-        <div class="row">
-          <div class="col-md-6">
-            <img src={deposit2} alt="deposit" class="img-fluid" />
+      <div className="container mt-5">
+        <div className="row">
+          <div className="col-md-6">
+            <img src={deposit2} alt="deposit" className="img-fluid" />
           </div>
 
-          <div class="form-box container-form-deposit mt-5 col-md-4 ">
-            <div class="container mt-3">
+          <div className="form-box container-form-deposit mt-5 col-md-4 ">
+            <div className="container mt-3">
               <h2 className="heading-deposit">Deposit</h2>
               <form onSubmit={depositSubmitHandler}>
-                <div class="form-group mb-4">
-                  <label for="inputAccountNo">Account No</label>
+                <div className="form-group mb-4">
+                  <label>Account No</label>
                   <input
                     type="text"
-                    class="form-control"
+                    className="form-control"
                     id="inputAccountNo"
                     value={accountNo}
                     disabled
                     style={{ color: "#999" }}
                   />
                 </div>
-                <div class="form-group mb-4">
-                  <label for="inputB">Amount</label>
+                <div className="form-group mb-4">
+                  <label>Amount</label>
                   <input
                     type="number"
-                    class="form-control"
+                    className="form-control"
                     id="inputB"
                     required
                     placeholder="Enter amount"
@@ -92,8 +94,11 @@ const Deposit = () => {
                   />
                 </div>
 
-                <div class="form-group ">
-                  <button type="submit" class="btn btn-primary button-space">
+                <div className="form-group ">
+                  <button
+                    type="submit"
+                    className="btn btn-primary button-space"
+                  >
                     Deposit
                   </button>
                   {successAlert && (
@@ -104,7 +109,7 @@ const Deposit = () => {
                   )}
                   <button
                     type="button"
-                    class="btn btn-secondary"
+                    className="btn btn-secondary"
                     onClick={depositCancelHandler}
                   >
                     Cancel
@@ -115,7 +120,7 @@ const Deposit = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

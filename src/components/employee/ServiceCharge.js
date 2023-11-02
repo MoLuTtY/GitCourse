@@ -4,10 +4,11 @@ import ViewCustomerHeader from "./ViewCustomerHeader";
 import serviceCharge2 from "../images/serviceCharge2.jpg";
 import { useNavigate, useLocation } from "react-router-dom";
 import SuccessAlert from "../SuccessAlert";
-import { useState } from "react";
+import React, { useState } from "react";
 import NoServiceChargeAlert from "../NoServiceChargeAlert";
 import ServiceChargeAlreadyDeducted from "../ServiceChargeAlreadyDeducted";
 import axios from "axios";
+import useTokenExpire from "../useTokenExpire";
 
 const ServiceCharge = ({ customerData }) => {
   const navigate = useNavigate("");
@@ -15,11 +16,13 @@ const ServiceCharge = ({ customerData }) => {
 
   const accountNo = location.state && location.state.accountNo;
   const accountType = location.state && location.state.accountType;
-  const token = localStorage.getItem("token");
 
   const [successAlert, setSuccessAlert] = useState(false);
   const [noServiceChargeAlert, setNoServiceChargeAlert] = useState(false);
   const [deductedAlert, setDeductedAlert] = useState(false);
+
+  const token = localStorage.getItem("token");
+  useTokenExpire();
 
   const deductServiceChargeHandler = async (e) => {
     e.preventDefault();
@@ -29,8 +32,6 @@ const ServiceCharge = ({ customerData }) => {
     );
 
     if (isConfirmed) {
-      console.log("Searching for customer...");
-
       try {
         const response = await axios.get(
           `http://localhost:8060/api/rules/service-charge/${accountNo}/${accountType}`,
@@ -43,20 +44,15 @@ const ServiceCharge = ({ customerData }) => {
 
         if (response.status === 200) {
           const responseData = response.data;
-          console.log("Response from server:", responseData);
 
           if (responseData.serviceCharge === 100) {
-            console.log("Service charge deducted: Rs.100");
-            console.log("Account No", accountNo);
             setSuccessAlert(true);
           } else if (
             responseData.serviceCharge === 0 &&
             responseData.reference === "Already deducted"
           ) {
-            console.log("service charge already deducted");
             setDeductedAlert(true);
           } else {
-            console.log("No service charge");
             setNoServiceChargeAlert(true);
           }
         } else {
@@ -76,12 +72,12 @@ const ServiceCharge = ({ customerData }) => {
   };
 
   return (
-    <div>
+    <>
       <ViewCustomerHeader></ViewCustomerHeader>
-      <div class="container mt-4">
-        <div class="row">
-          <div class="col-md-6">
-            <div class="p-4">
+      <div className="container mt-4">
+        <div className="row">
+          <div className="col-md-6">
+            <div className="p-4">
               <h2 className="mt-5 service-head mb-4">
                 Service Charge Deduction
               </h2>
@@ -120,12 +116,16 @@ const ServiceCharge = ({ customerData }) => {
               </form>
             </div>
           </div>
-          <div class="col-md-6">
-            <img src={serviceCharge2} alt="service charge" class="img-fluid" />
+          <div className="col-md-6">
+            <img
+              src={serviceCharge2}
+              alt="service charge"
+              className="img-fluid"
+            />
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

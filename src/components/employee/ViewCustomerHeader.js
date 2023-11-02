@@ -1,9 +1,10 @@
 import "./ViewCustomerHeader.css";
 import { Link } from "react-router-dom";
+import React from "react";
 
 const ViewCustomerHeader = () => {
   return (
-    <div>
+    <>
       <nav className="navbar navbar-expand-lg navbar-dark ">
         <div className="container">
           <a className="navbar-brand" href="#">
@@ -31,7 +32,7 @@ const ViewCustomerHeader = () => {
           </div>
         </div>
       </nav>
-    </div>
+    </>
   );
 };
 

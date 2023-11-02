@@ -2,20 +2,22 @@ import EmployeeHeader from "./EmployeeHeader";
 import "./DeleteCustomer.css";
 import ViewCustomerHeader from "./ViewCustomerHeader";
 import deleteCustomer from "../images/deleteCustomer.jpg";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import SuccessAlert from "../SuccessAlert";
 import axios from "axios";
+import useTokenExpire from "../useTokenExpire";
 
 const DeleteCustomer = () => {
   const navigate = useNavigate("");
-
   const location = useLocation();
 
   const accountNo = location.state && location.state.accountNo;
   const [successAlert, setSuccessAlert] = useState(false);
   const [customerId, setCustomerId] = useState("");
+
   const token = localStorage.getItem("token");
+  useTokenExpire();
 
   useEffect(() => {
     const fetchCustomerId = async () => {
@@ -46,7 +48,6 @@ const DeleteCustomer = () => {
     );
 
     if (isConfirmed) {
-      console.log(customerId);
       try {
         await axios.delete(
           `http://localhost:8080/api/customers/delete-customer/${customerId}`,
@@ -69,22 +70,22 @@ const DeleteCustomer = () => {
   };
 
   return (
-    <div>
+    <>
       <ViewCustomerHeader></ViewCustomerHeader>
-      <div class="container mt-5">
-        <div class="row">
-          <div class="col-md-6 ">
-            <img src={deleteCustomer} alt="Image 1" class="img-fluid" />
+      <div className="container mt-5">
+        <div className="row">
+          <div className="col-md-6 ">
+            <img src={deleteCustomer} alt="Image 1" className="img-fluid" />
           </div>
           <div className="form-box form-delete col-md-4 mt-5">
-            <div class="container mt-3">
+            <div className="container mt-3">
               <h2 className="heading-delete">Delete Customer</h2>
               <form onSubmit={deleteCustomerSubmitHandler}>
-                <div class="form-group mb-4">
-                  <label for="inputB">Account No</label>
+                <div className="form-group mb-4">
+                  <label>Account No</label>
                   <input
                     type="number"
-                    class="form-control"
+                    className="form-control"
                     id="inputB"
                     required
                     placeholder="Enter account no"
@@ -94,10 +95,10 @@ const DeleteCustomer = () => {
                   />
                 </div>
 
-                <div class="form-group ">
+                <div className="form-group ">
                   <button
                     type="submit"
-                    class="btn btn-primary button-space mt-3"
+                    className="btn btn-primary button-space mt-3"
                   >
                     Delete
                   </button>
@@ -113,7 +114,7 @@ const DeleteCustomer = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

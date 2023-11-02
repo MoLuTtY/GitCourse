@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import SuccessAlert from "../SuccessAlert";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import useTokenExpire from "../useTokenExpire";
+import React from "react";
 
 const Withdraw = () => {
   const navigate = useNavigate("");
@@ -20,7 +22,9 @@ const Withdraw = () => {
 
   const location = useLocation();
   const accountNo = location.state && location.state.accountNo;
+
   const token = localStorage.getItem("token");
+  useTokenExpire();
 
   const fromAccountHandler = (event) => {
     setFromAccount(event.target.value);
@@ -68,7 +72,6 @@ const Withdraw = () => {
           );
 
           setSuccessAlert(true);
-          console.log("Withdraw successful");
         } catch (error) {
           setFailureAlert(true);
         }
@@ -89,24 +92,24 @@ const Withdraw = () => {
     setErrorMessage("");
   };
   return (
-    <div>
+    <>
       <CustomerHeader></CustomerHeader>
-      <div class="container mt-5">
-        <div class="row">
-          <div class="col-md-6">
-            <img src={withdrawatm} alt="atm" class="img-fluid" />
+      <div className="container mt-5">
+        <div className="row">
+          <div className="col-md-6">
+            <img src={withdrawatm} alt="atm" className="img-fluid" />
           </div>
 
-          <div class="form-box container-form-withdraw col-md-4 mt-5">
-            <div class="container mt-3 ">
+          <div className="form-box container-form-withdraw col-md-4 mt-5">
+            <div className="container mt-3 ">
               <h2 className="heading-withdraw">Withdraw</h2>
               <form onSubmit={withdrawSubmitHandler}>
-                <div class=" form-group mb-4">
-                  <label for="selectA">From Account</label>
+                <div className=" form-group mb-4">
+                  <label>From Account</label>
 
-                  <div class="input-group">
+                  <div className="input-group">
                     <select
-                      class="form-select"
+                      className="form-select"
                       id="accountType"
                       name="accountType"
                       value={enteredFromAccount}
@@ -118,11 +121,11 @@ const Withdraw = () => {
                   </div>
                 </div>
 
-                <div class="form-group mb-4">
-                  <label for="inputB">Amount</label>
+                <div className="form-group mb-4">
+                  <label>Amount</label>
                   <input
                     type="number"
-                    class="form-control"
+                    className="form-control"
                     id="inputB"
                     placeholder="Enter amount"
                     required
@@ -131,8 +134,11 @@ const Withdraw = () => {
                   />
                 </div>
 
-                <div class="form-group ">
-                  <button type="submit" class="btn btn-primary button-space">
+                <div className="form-group ">
+                  <button
+                    type="submit"
+                    className="btn btn-primary button-space"
+                  >
                     Withdraw
                   </button>
                   {successAlert && (
@@ -159,7 +165,7 @@ const Withdraw = () => {
                   )}
                   <button
                     type="button"
-                    class="btn btn-secondary"
+                    className="btn btn-secondary"
                     onClick={withdrawCancelHandler}
                   >
                     Cancel
@@ -170,7 +176,7 @@ const Withdraw = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -1,9 +1,10 @@
+import React from "react";
 import "./EmployeeHeader.css";
 import { Link } from "react-router-dom";
 
 const EmployeeHeader = () => {
   return (
-    <div>
+    <>
       <nav className="navbar navbar-expand-lg navbar-dark ">
         <div className="container">
           <a className="navbar-brand" href="#">
@@ -26,7 +27,7 @@ const EmployeeHeader = () => {
           </div>
         </div>
       </nav>
-    </div>
+    </>
   );
 };
 

@@ -4,6 +4,8 @@ import transactions2 from "../images/transactions2.jpg";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import useTokenExpire from "../useTokenExpire";
+import React from "react";
 
 const Transactions = () => {
   const [enteredFromDate, setFromDate] = useState("");
@@ -14,6 +16,7 @@ const Transactions = () => {
   const [showFilter, setShowFilter] = useState(false);
 
   const token = localStorage.getItem("token");
+  useTokenExpire();
 
   const location = useLocation();
   const customerId = location.state && location.state.customerId;
@@ -103,23 +106,23 @@ const Transactions = () => {
   };
 
   return (
-    <div>
+    <>
       <CustomerHeader></CustomerHeader>
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-8 p-4 mt-5">
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-md-8 p-4 mt-5">
             <h2 className="table-container mb-5 t-heading">Transactions</h2>
 
-            <div class="container mt-5 " style={containerStyle}>
+            <div className="container mt-5 " style={containerStyle}>
               <form
-                class="row align-items-center trans-form"
+                className="row align-items-center trans-form"
                 onSubmit={viewTransactionsHandler}
               >
-                <div class="col-md-3 div-mr">
+                <div className="col-md-3 div-mr">
                   <label>Account No</label>
                   <input
                     type="text"
-                    class="form-control "
+                    className="form-control "
                     required
                     placeholder="Account Number"
                     value={accountNo}
@@ -127,25 +130,25 @@ const Transactions = () => {
                     style={{ color: "#999" }}
                   />
                 </div>
-                <div class="col-md-3">
+                <div className="col-md-3">
                   <label>Date From</label>
                   <input
                     type="date"
-                    class="form-control"
+                    className="form-control"
                     required
                     onChange={dateFromHandler}
                   />
                 </div>
-                <div class="col-md-3">
+                <div className="col-md-3">
                   <label>Date To</label>
                   <input
                     type="date"
-                    class="form-control"
+                    className="form-control"
                     required
                     onChange={dateToHandler}
                   />
                 </div>
-                <div class="col-md-3 mt-4">
+                <div className="col-md-3 mt-4">
                   <button className="btn btn-primary">View Transactions</button>
                 </div>
               </form>
@@ -199,14 +202,18 @@ const Transactions = () => {
             </div>
           </div>
 
-          <div class="col-md-4 img-container mt-5">
-            <div class="p-1">
-              <img src={transactions2} alt="transactions" class="img-fluid" />
+          <div className="col-md-4 img-container mt-5">
+            <div className="p-1">
+              <img
+                src={transactions2}
+                alt="transactions"
+                className="img-fluid"
+              />
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

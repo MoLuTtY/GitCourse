@@ -1,9 +1,6 @@
-import React from "react";
-import Login from "./Login";
-
 const Logout = () => {
   localStorage.removeItem("token");
-  return <Login />;
+  window.location.href = "/login";
 };
 
 export default Logout;

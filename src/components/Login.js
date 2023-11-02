@@ -6,10 +6,9 @@ import axios from "axios";
 
 const Login = ({ onLogin }) => {
   const navigate = useNavigate();
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -18,28 +17,36 @@ const Login = ({ onLogin }) => {
       password: password,
     };
 
-    const response = await axios.post(
-      "http://localhost:8084/login",
-      loginRequest
-    );
-    if (response.data != null) {
-      const token = response.data.authToken;
-      localStorage.setItem("token", token);
-    }
+    try {
+      const response = await axios.post(
+        "http://localhost:8084/login",
+        loginRequest
+      );
+      if (response.data != null) {
+        const token = response.data.authToken;
+        localStorage.setItem("token", token);
+      }
 
-    if (response.data.role === "EMPLOYEE") {
-      navigate("/employee-dashboard");
-    } else if (response.data.role === "CUSTOMER") {
-      const customerId = response.data.userid;
-      onLogin(customerId);
-      navigate("/customer-dashboard");
-    } else {
-      setError("Invalid username or password");
+      if (response.data.role === "EMPLOYEE") {
+        navigate("/employee-dashboard");
+      } else if (response.data.role === "CUSTOMER") {
+        const customerId = response.data.userid;
+        onLogin(customerId);
+        navigate("/customer-dashboard");
+      }
+    } catch (error) {
+      setErrorMessage("Incorrect credentials. Please try again.");
+      setUsername("");
+      setPassword("");
     }
   };
 
+  const handleInputChange = () => {
+    setErrorMessage("");
+  };
+
   return (
-    <div>
+    <>
       <nav className="navbar navbar-expand-lg navbar-dark ">
         <div className="container">
           <a className="navbar-brand" href="#">
@@ -58,6 +65,9 @@ const Login = ({ onLogin }) => {
                 <div className="text-center">
                   <h3 className="mb-5 login-heading">Login</h3>
                 </div>
+                {errorMessage && (
+                  <p className="text-danger mt-3">{errorMessage}</p>
+                )}
                 <div className="form-outline mb-4">
                   <input
                     type="text"
@@ -66,11 +76,12 @@ const Login = ({ onLogin }) => {
                     placeholder="Username"
                     required
                     value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    onChange={(e) => {
+                      setUsername(e.target.value);
+                      handleInputChange();
+                    }}
                   />
-                  <label className="form-label" for="form1Example13">
-                    Username
-                  </label>
+                  <label className="form-label">Username</label>
                 </div>
 
                 <div className="form-outline mb-4">
@@ -81,13 +92,13 @@ const Login = ({ onLogin }) => {
                     placeholder="Password"
                     required
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      handleInputChange();
+                    }}
                   />
 
-                  <label className="form-label" for="form1Example23">
-                    Password
-                  </label>
-                  {error && <p className="error">{error}</p>}
+                  <label className="form-label">Password</label>
                 </div>
 
                 <div className="d-grid">
@@ -104,7 +115,7 @@ const Login = ({ onLogin }) => {
           </div>
         </div>
       </section>
-    </div>
+    </>
   );
 };
 

@@ -1,24 +1,26 @@
-import "./EmployeeDashboard.css";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import createCustomer from "../images/createCustomer.jpg";
 import viewCustomer from "../images/viewCustomer.jpg";
+import useTokenExpire from "../useTokenExpire";
+import "./EmployeeDashboard.css";
+
+const CREATE_CUSTOMER_PATH = "/create-customer";
+const VIEW_CUSTOMER_PATH = "/view-customer";
 
 const EmployeeDashboard = () => {
-  const storedToken = localStorage.getItem("token");
-  console.log(storedToken);
-
+  useTokenExpire();
   const navigate = useNavigate();
+
   const navigateToCreateCustomer = () => {
-    navigate("/create-customer");
+    navigate(CREATE_CUSTOMER_PATH);
   };
-  const navigateToCreateAccount = () => {
-    navigate("/create-account");
-  };
+
   const navigateToViewCustomer = () => {
-    navigate("/view-customer");
+    navigate(VIEW_CUSTOMER_PATH);
   };
   return (
-    <div>
+    <>
       <nav className="navbar navbar-expand-lg navbar-dark ">
         <div className="container">
           <a className="navbar-brand" href="#">
@@ -44,7 +46,7 @@ const EmployeeDashboard = () => {
               <img
                 className="img-fluid"
                 src={createCustomer}
-                alt="create customer"
+                alt="create customer image"
               />
               <button
                 className="btn btn-primary w-100 mt-auto"
@@ -60,7 +62,7 @@ const EmployeeDashboard = () => {
               <img
                 className="img-fluid"
                 src={viewCustomer}
-                alt="view customer"
+                alt="view customer image"
               />
               <button
                 className="btn btn-primary w-100 mt-auto"
@@ -72,7 +74,7 @@ const EmployeeDashboard = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -7,6 +7,9 @@ import SuccessAlert from "../SuccessAlert";
 import axios from "axios";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import useTokenExpire from "../useTokenExpire";
+import React from "react";
+
 const Transfer = () => {
   const navigate = useNavigate("");
 
@@ -14,14 +17,17 @@ const Transfer = () => {
   const [enteredTargetAccount, setTargetAccount] = useState("");
   const [enteredAmount, setAmount] = useState("");
   const [successAlert, setSuccessAlert] = useState(false);
-
   const [insufficientAlert, setInsufficientAlert] = useState(false);
   const [currentBalance, setCurrentBalance] = useState("");
   const [failureAlert, setFailureAlert] = useState(false);
+  const [targetAccountExist, setTargetAccountexist] = useState(true);
+  const [targetAccountNotExistAlert, setTargetAccountNotExistAlert] =
+    useState(false);
 
   const location = useLocation();
   const accountNo = location.state && location.state.accountNo;
   const token = localStorage.getItem("token");
+  useTokenExpire();
 
   const fromAccountHandler = (event) => {
     setFromAccount(event.target.value);
@@ -44,7 +50,16 @@ const Transfer = () => {
       .then((response) => response.json())
       .then((data) => setCurrentBalance(data))
       .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+  }, [enteredFromAccount]);
+
+  useEffect(() => {
+    const apiUrl = `http://localhost:8090/api/accounts/account-exist/${enteredTargetAccount}/SAVINGS`;
+
+    fetch(apiUrl)
+      .then((response) => response.json())
+      .then((data) => setTargetAccountexist(data))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, [enteredTargetAccount]);
 
   const transferSubmitHandler = async (e) => {
     e.preventDefault();
@@ -60,6 +75,8 @@ const Transfer = () => {
 
       if (transferData.amount > currentBalance) {
         setInsufficientAlert(true);
+      } else if (targetAccountExist === false) {
+        setTargetAccountNotExistAlert(true);
       } else {
         try {
           const response = await axios.post(
@@ -71,7 +88,6 @@ const Transfer = () => {
               },
             }
           );
-
           setSuccessAlert(true);
         } catch (error) {
           setFailureAlert(true);
@@ -84,6 +100,7 @@ const Transfer = () => {
     setSuccessAlert(false);
     setInsufficientAlert(false);
     setFailureAlert(false);
+    setTargetAccountNotExistAlert(false);
     navigate("/customer-dashboard");
   };
 
@@ -94,24 +111,24 @@ const Transfer = () => {
   };
 
   return (
-    <div>
+    <>
       <CustomerHeader></CustomerHeader>
-      <div class="container mt-5">
-        <div class="row">
-          <div class="col-md-6">
-            <img src={transfer2} alt="transfer" class="img-fluid" />
+      <div className="container mt-5">
+        <div className="row">
+          <div className="col-md-6">
+            <img src={transfer2} alt="transfer" className="img-fluid" />
           </div>
 
-          <div class="form-box container-form2 col-md-4 mt-5">
-            <div class="container mt-3">
+          <div className="form-box container-form2 col-md-4 mt-5">
+            <div className="container mt-3">
               <h2 className="heading2">Transfer</h2>
               <form onSubmit={transferSubmitHandler}>
-                <div class=" form-group mb-4">
-                  <label for="selectA">From Account</label>
+                <div className=" form-group mb-4">
+                  <label>From Account</label>
 
-                  <div class="input-group">
+                  <div className="input-group">
                     <select
-                      class="form-select"
+                      className="form-select"
                       id="accountType"
                       name="accountType"
                       value={enteredFromAccount}
@@ -123,11 +140,11 @@ const Transfer = () => {
                   </div>
                 </div>
 
-                <div class="form-group mb-4">
-                  <label for="inputB">Target Account</label>
+                <div className="form-group mb-4">
+                  <label>Target Account</label>
                   <input
                     type="number"
-                    class="form-control"
+                    className="form-control"
                     id="inputB"
                     required
                     value={enteredTargetAccount}
@@ -136,11 +153,11 @@ const Transfer = () => {
                   />
                 </div>
 
-                <div class="form-group mb-4">
-                  <label for="inputB">Amount</label>
+                <div className="form-group mb-4">
+                  <label>Amount</label>
                   <input
                     type="number"
-                    class="form-control"
+                    className="form-control"
                     id="inputB"
                     required
                     value={enteredAmount}
@@ -148,8 +165,11 @@ const Transfer = () => {
                     onChange={amountHandler}
                   />
                 </div>
-                <div class="form-group ">
-                  <button type="submit" class="btn btn-primary button-space">
+                <div className="form-group ">
+                  <button
+                    type="submit"
+                    className="btn btn-primary button-space"
+                  >
                     Transfer
                   </button>
                   {successAlert && (
@@ -172,9 +192,16 @@ const Transfer = () => {
                       onClose={closeAlert}
                     />
                   )}
+
+                  {targetAccountNotExistAlert && (
+                    <SuccessAlert
+                      message={"Target Account doesnt exist!"}
+                      onClose={closeAlert}
+                    />
+                  )}
                   <button
                     type="button"
-                    class="btn btn-secondary"
+                    className="btn btn-secondary"
                     onClick={transferCancelHandler}
                   >
                     Cancel
@@ -185,7 +212,7 @@ const Transfer = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

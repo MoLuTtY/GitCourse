@@ -13,13 +13,7 @@ import ServiceCharge from "./components/employee/ServiceCharge";
 import DeleteCustomer from "./components/employee/DeleteCustomer";
 import Error from "./components/Error";
 import React, { useState } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-  Link,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useEffect } from "react";
 import Logout from "./components/Logout";
 

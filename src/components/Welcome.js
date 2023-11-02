@@ -1,12 +1,12 @@
 import welcome from "../components/images/welcome.jpeg";
 import "./Welcome.css";
 import WelcomeHeader from "./WelcomeHeader";
+import React from "react";
 
 const Welcome = () => {
   return (
-    <div>
+    <>
       <WelcomeHeader></WelcomeHeader>
-
       <div className="container2 mt-5">
         <div>
           <p className="welcome-text">
@@ -16,7 +16,7 @@ const Welcome = () => {
         </div>
         <img className="img-fluid" src={welcome} alt="Bank" />
       </div>
-    </div>
+    </>
   );
 };
 export default Welcome;

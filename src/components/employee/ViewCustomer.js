@@ -2,7 +2,7 @@ import EmployeeHeader from "./EmployeeHeader";
 import "./ViewCustomer.css";
 import { useNavigate } from "react-router-dom";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import {
@@ -10,6 +10,7 @@ import {
   faMinusSquare,
   faPlusSquare,
 } from "@fortawesome/free-solid-svg-icons";
+import useTokenExpire from "../useTokenExpire";
 
 const ViewCustomer = () => {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ const ViewCustomer = () => {
   const [notExist, setnotExist] = useState(false);
 
   const token = localStorage.getItem("token");
+  useTokenExpire();
 
   useEffect(() => {
     fetch(
@@ -95,14 +97,12 @@ const ViewCustomer = () => {
     navigate("/deposit", {
       state: { accountNo, accountType },
     });
-    console.log(accountNo + " " + accountType);
   };
 
   const servicechargeHandler = (accountNo, accountType) => {
     navigate("/service-charge", {
       state: { accountNo, accountType },
     });
-    console.log(accountNo + " " + accountType);
   };
 
   const deleteCustomerHandler = (accountNo) => {
@@ -134,22 +134,22 @@ const ViewCustomer = () => {
     },
   };
   return (
-    <div>
+    <>
       <EmployeeHeader></EmployeeHeader>
       <div>
         <h2 className="view-cus-head mt-4 ">View Customer</h2>
 
-        <div class="container col-sm-7 mt-5">
+        <div className="container col-sm-7 mt-5">
           <form
-            class="row"
+            className="row"
             style={styles.formBackground}
             onSubmit={searchCustomerHandler}
           >
-            <div class="col-sm-4 form-group ">
-              <label for="accountNo">Account No:</label>
+            <div className="col-sm-4 form-group ">
+              <label>Account No:</label>
               <input
                 type="text"
-                class="form-control"
+                className="form-control"
                 id="accountNo"
                 name="accountNo"
                 placeholder="Enter Account No"
@@ -157,11 +157,11 @@ const ViewCustomer = () => {
                 onChange={(e) => setAccountNo(e.target.value)}
               />
             </div>
-            <div class="col-sm-4 form-group">
-              <label for="accountType">Account Type:</label>
-              <div class="input-group">
+            <div className="col-sm-4 form-group">
+              <label>Account Type:</label>
+              <div className="input-group">
                 <select
-                  class="form-select"
+                  className="form-select"
                   id="accountType"
                   name="accountType"
                   onChange={(e) => setAccountType(e.target.value)}
@@ -171,8 +171,8 @@ const ViewCustomer = () => {
                 </select>
               </div>
             </div>
-            <div class="col-sm-4 mt-4">
-              <button type="submit" class="btn btn-primary">
+            <div className="col-sm-4 mt-4">
+              <button type="submit" className="btn btn-primary">
                 Search
               </button>
             </div>
@@ -180,10 +180,10 @@ const ViewCustomer = () => {
         </div>
 
         <div className="table-service-container">
-          <div class="container mt-5 ">
+          <div className="container mt-5 ">
             {customerDetailsTable && (
-              <table class="table table-bordered table-striped text-center">
-                <thead class="thead-dark">
+              <table className="table table-bordered table-striped text-center">
+                <thead className="thead-dark">
                   <tr>
                     <th>Account No</th>
                     <th>Name</th>
@@ -198,7 +198,7 @@ const ViewCustomer = () => {
 
                 <tbody>
                   {sortedTransactions.map((customer) => (
-                    <tr key={customer.id}>
+                    <tr key={customer.accountNo}>
                       <td className="align-middle">{customer.accountNo}</td>
                       <td className="align-middle">{customer.customerName}</td>
                       <td className="align-middle">{customer.dateOfBirth}</td>
@@ -298,13 +298,11 @@ const ViewCustomer = () => {
           </div>
         </div>
 
-        {/*  */}
-
         <div className="table-service-container">
-          <div class="container mt-5 ">
+          <div className="container mt-5 ">
             {searchCustomerTable && (
-              <table class="table table-bordered table-striped text-center">
-                <thead class="thead-dark">
+              <table className="table table-bordered table-striped text-center">
+                <thead className="thead-dark">
                   <tr>
                     <th>Account No</th>
                     <th>Name</th>
@@ -425,7 +423,6 @@ const ViewCustomer = () => {
           </div>
         </div>
 
-        {/*  */}
         {notExist && (
           <div style={styles.container}>
             <div style={styles.content}>
@@ -434,7 +431,7 @@ const ViewCustomer = () => {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 };
 

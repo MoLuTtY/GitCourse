@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import SuccessAlert from "../SuccessAlert";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import useTokenExpire from "../useTokenExpire";
+import React from "react";
 
 const CreateCustomer = () => {
   const navigate = useNavigate("");
@@ -28,6 +30,7 @@ const CreateCustomer = () => {
   const [isAddressValid, setIsAddressValid] = useState(true);
 
   const token = localStorage.getItem("token");
+  useTokenExpire();
 
   const customerNameChangeHandler = (event) => {
     const inputValue = event.target.value;
@@ -137,8 +140,6 @@ const CreateCustomer = () => {
       address: enteredAddress,
     };
 
-    console.log(customerData);
-
     try {
       const response = await axios.post(
         "http://localhost:8080/api/customers/create-customer",
@@ -151,17 +152,11 @@ const CreateCustomer = () => {
       );
 
       if (response.status === 200) {
-        console.log("Customer created successfully");
-        console.log(customerData);
-
         const accountData = {
           customerId: response.data.customerId,
           openingAmount: enteredOpeningAmount,
           initiationDate: enteredInitiationDate,
         };
-
-        console.log(accountData);
-
         const accountResponse = await axios.post(
           "http://localhost:8090/api/accounts/create-account",
           accountData,
@@ -187,7 +182,6 @@ const CreateCustomer = () => {
   };
 
   const handleCreateCustomerCancel = () => {
-    // setCustomerId("");
     setCustomerName("");
     setPassword("");
     setDob("");
@@ -206,20 +200,20 @@ const CreateCustomer = () => {
   };
 
   return (
-    <div>
+    <>
       <EmployeeHeader></EmployeeHeader>
-      <div class="container mt-5">
-        <div class="row">
-          <div class="col-md-5 create-customer-form form-bg">
+      <div className="container mt-5">
+        <div className="row">
+          <div className="col-md-5 create-customer-form form-bg">
             <div>
               <div>
                 <form onSubmit={handleCreateCustomerSubmit}>
-                  <h2 class="text-center mb-4 mt-4 create-cus-head">
+                  <h2 className="text-center mb-4 mt-4 create-cus-head">
                     Create Customer
                   </h2>
 
-                  <div class="form-group form-grp mt-3">
-                    <label for="customer-name">Customer Name</label>
+                  <div className="form-group form-grp mt-3">
+                    <label>Customer Name</label>
                     <input
                       type="text"
                       className={`form-control ${
@@ -238,8 +232,8 @@ const CreateCustomer = () => {
                       </div>
                     )}
                   </div>
-                  <div class="form-group form-grp mt-3">
-                    <label for="password">Password</label>
+                  <div className="form-group form-grp mt-3">
+                    <label>Password</label>
                     <input
                       type="password"
                       className={`form-control ${
@@ -258,10 +252,10 @@ const CreateCustomer = () => {
                     )}
                   </div>
 
-                  <div class="form-group form-grp mt-3">
-                    <div class="row">
-                      <div class="col-md-6">
-                        <label for="dob">Date of Birth</label>
+                  <div className="form-group form-grp mt-3">
+                    <div className="row">
+                      <div className="col-md-6">
+                        <label>Date of Birth</label>
                         <input
                           type="date"
                           className={`form-control ${
@@ -278,8 +272,8 @@ const CreateCustomer = () => {
                           </div>
                         )}
                       </div>
-                      <div class="col-md-6">
-                        <label for="pan">PAN</label>
+                      <div className="col-md-6">
+                        <label>PAN</label>
                         <input
                           type="text"
                           className={`form-control ${
@@ -300,10 +294,10 @@ const CreateCustomer = () => {
                       </div>
                     </div>
                   </div>
-                  <div class="form-group form-grp mt-3">
-                    <div class="row">
-                      <div class="col-md-6">
-                        <label for="dob">Initiation Date</label>
+                  <div className="form-group form-grp mt-3">
+                    <div className="row">
+                      <div className="col-md-6">
+                        <label>Initiation Date</label>
                         <input
                           type="date"
                           className={`form-control ${
@@ -320,8 +314,8 @@ const CreateCustomer = () => {
                           </div>
                         )}
                       </div>
-                      <div class="col-md-6">
-                        <label for="pan">Opening Amount</label>
+                      <div className="col-md-6">
+                        <label>Opening Amount</label>
                         <input
                           type="number"
                           className={`form-control ${
@@ -341,8 +335,8 @@ const CreateCustomer = () => {
                       </div>
                     </div>
                   </div>
-                  <div class="form-group form-grp mt-3">
-                    <label for="address">Address</label>
+                  <div className="form-group form-grp mt-3">
+                    <label>Address</label>
                     <textarea
                       className={`form-control ${
                         isAddressValid ? "" : "is-invalid"
@@ -361,8 +355,11 @@ const CreateCustomer = () => {
                       </div>
                     )}
                   </div>
-                  {/* </div> */}
-                  <button type="submit" class="btn btn-primary form-grp mt-4">
+
+                  <button
+                    type="submit"
+                    className="btn btn-primary form-grp mt-4"
+                  >
                     Create
                   </button>
                   {successAlert && (
@@ -373,7 +370,7 @@ const CreateCustomer = () => {
                   )}
                   <button
                     type="button"
-                    class="btn btn-secondary btn2 form-grp mt-4"
+                    className="btn btn-secondary btn2 form-grp mt-4"
                     onClick={handleCreateCustomerCancel}
                   >
                     Cancel
@@ -382,16 +379,16 @@ const CreateCustomer = () => {
               </div>
             </div>
           </div>
-          <div class="col-md-6 createCustomer-img-container">
+          <div className="col-md-6 createCustomer-img-container">
             <img
               src={createCustomer2}
               alt="create customer"
-              class="img-fluid"
+              className="img-fluid"
             />
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
