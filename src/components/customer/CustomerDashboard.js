@@ -7,22 +7,22 @@ import withdraw from "../images/withdraw.jpg";
 import useTokenExpire from "../useTokenExpire";
 import React from "react";
 
-const CustomerDashboard = ({ customerId, accountNo }) => {
+const CustomerDashboard = () => {
   const navigate = useNavigate();
   useTokenExpire();
 
   const navigateToProfile = () => {
-    navigate("/customer-profile", { state: { customerId } });
+    navigate("/customer-profile");
   };
   const navigateToTransactions = () => {
-    navigate("/customer-transactions", { state: { customerId, accountNo } });
+    navigate("/customer-transactions");
   };
 
   const navigateToWithdraw = () => {
-    navigate("/customer-withdraw", { state: { accountNo } });
+    navigate("/customer-withdraw");
   };
   const navigateToTransfer = () => {
-    navigate("/customer-transfer", { state: { accountNo } });
+    navigate("/customer-transfer");
   };
   return (
     <>

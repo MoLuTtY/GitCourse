@@ -14,13 +14,10 @@ const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [showTransaction, setShowTransaction] = useState(true);
   const [showFilter, setShowFilter] = useState(false);
-
   const token = localStorage.getItem("token");
   useTokenExpire();
-
-  const location = useLocation();
-  const customerId = location.state && location.state.customerId;
-  const accountNo = location.state && location.state.accountNo;
+  const customerId = localStorage.getItem("customerId");
+  const accountNo = localStorage.getItem("accountNo");
 
   const dateFromHandler = (event) => {
     setFromDate(event.target.value);

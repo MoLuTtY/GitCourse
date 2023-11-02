@@ -11,7 +11,6 @@ import React from "react";
 
 const Withdraw = () => {
   const navigate = useNavigate("");
-
   const [enteredFromAccount, setFromAccount] = useState("SAVINGS");
   const [enteredAmount, setAmount] = useState("");
   const [successAlert, setSuccessAlert] = useState(false);
@@ -19,10 +18,7 @@ const Withdraw = () => {
   const [insufficientAlert, setInsufficientAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [currentBalance, setCurrentBalance] = useState("");
-
-  const location = useLocation();
-  const accountNo = location.state && location.state.accountNo;
-
+  const accountNo = localStorage.getItem("accountNo");
   const token = localStorage.getItem("token");
   useTokenExpire();
 

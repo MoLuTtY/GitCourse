@@ -12,7 +12,6 @@ import React from "react";
 
 const Transfer = () => {
   const navigate = useNavigate("");
-
   const [enteredFromAccount, setFromAccount] = useState("SAVINGS");
   const [enteredTargetAccount, setTargetAccount] = useState("");
   const [enteredAmount, setAmount] = useState("");
@@ -23,9 +22,7 @@ const Transfer = () => {
   const [targetAccountExist, setTargetAccountexist] = useState(true);
   const [targetAccountNotExistAlert, setTargetAccountNotExistAlert] =
     useState(false);
-
-  const location = useLocation();
-  const accountNo = location.state && location.state.accountNo;
+  const accountNo = localStorage.getItem("accountNo");
   const token = localStorage.getItem("token");
   useTokenExpire();
 

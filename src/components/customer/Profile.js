@@ -7,9 +7,7 @@ import useTokenExpire from "../useTokenExpire";
 
 const Profile = () => {
   const [customerData, setCustomerData] = useState([]);
-  const location = useLocation();
-  const customerId = location.state && location.state.customerId;
-
+  const customerId = localStorage.getItem("customerId");
   const token = localStorage.getItem("token");
   useTokenExpire();
 

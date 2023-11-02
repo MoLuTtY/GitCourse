@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import login from "../components/images/login.jpeg";
 import axios from "axios";
 
-const Login = ({ onLogin }) => {
+const Login = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -23,15 +23,13 @@ const Login = ({ onLogin }) => {
         loginRequest
       );
       if (response.data != null) {
-        const token = response.data.authToken;
-        localStorage.setItem("token", token);
+        localStorage.setItem("token", response.data.authToken);
       }
 
       if (response.data.role === "EMPLOYEE") {
         navigate("/employee-dashboard");
       } else if (response.data.role === "CUSTOMER") {
-        const customerId = response.data.userid;
-        onLogin(customerId);
+        localStorage.setItem("customerId", response.data.userid);
         navigate("/customer-dashboard");
       }
     } catch (error) {

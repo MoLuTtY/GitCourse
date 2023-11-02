@@ -12,19 +12,14 @@ import Deposit from "./components/employee/Deposit";
 import ServiceCharge from "./components/employee/ServiceCharge";
 import DeleteCustomer from "./components/employee/DeleteCustomer";
 import Error from "./components/Error";
-import React, { useState } from "react";
+import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useEffect } from "react";
 import Logout from "./components/Logout";
 
 function App() {
-  const [customerId, setCustomerId] = useState(null);
-  const [accountNo, setAccountNo] = useState(null);
   const token = localStorage.getItem("token");
-
-  const onLogin = (customerId) => {
-    setCustomerId(customerId);
-  };
+  const customerId = localStorage.getItem("customerId");
 
   useEffect(() => {
     if (customerId !== null) {
@@ -38,7 +33,7 @@ function App() {
       )
         .then((response) => response.json())
         .then((data) => {
-          setAccountNo(data.accountId.accountNo);
+          localStorage.setItem("accountNo", data.accountId.accountNo);
         })
         .catch((error) => {
           console.error("Error fetching customer data:", error);
@@ -50,13 +45,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Welcome />} />
-        <Route path="/login" element={<Login onLogin={onLogin} />} />
-        <Route
-          path="/customer-dashboard"
-          element={
-            <CustomerDashboard customerId={customerId} accountNo={accountNo} />
-          }
-        />
+        <Route path="/login" element={<Login />} />
+        <Route path="/customer-dashboard" element={<CustomerDashboard />} />
         <Route path="/customer-profile" element={<Profile />} />
         <Route path="/customer-transactions" element={<Transactions />} />
         <Route path="/customer-withdraw" element={<Withdraw />} />
