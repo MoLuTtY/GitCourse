@@ -1,8 +1,16 @@
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+
 const Logout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("customerId");
-  localStorage.removeItem("accountNo");
-  window.location.href = "/login";
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("accountNo");
+    localStorage.removeItem("customerId");
+    localStorage.removeItem("authenticated");
+    navigate("/login");
+  }, [navigate]);
 };
 
 export default Logout;

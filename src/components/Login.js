@@ -24,6 +24,7 @@ const Login = ({ onLogin }) => {
       );
       if (response.data != null) {
         localStorage.setItem("token", response.data.authToken);
+        localStorage.setItem("authenticated", true);
       }
 
       if (response.data.role === "EMPLOYEE") {

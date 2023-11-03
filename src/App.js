@@ -16,10 +16,12 @@ import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { useEffect } from "react";
 import Logout from "./components/Logout";
+import { Navigate } from "react-router-dom";
 
 function App() {
   const [customerId, setCustomerId] = useState(null);
   const token = localStorage.getItem("token");
+  const authenticated = localStorage.getItem("authenticated");
 
   const onLogin = (customerId) => {
     setCustomerId(customerId);
@@ -50,19 +52,25 @@ function App() {
       <Routes>
         <Route path="/" element={<Welcome />} />
         <Route path="/login" element={<Login onLogin={onLogin} />} />
-        <Route path="/customer-dashboard" element={<CustomerDashboard />} />
-        <Route path="/customer-profile" element={<Profile />} />
-        <Route path="/customer-transactions" element={<Transactions />} />
-        <Route path="/customer-withdraw" element={<Withdraw />} />
-        <Route path="/customer-transfer" element={<Transfer />} />
-        <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
-        <Route path="/create-customer" element={<CreateCustomer />} />
-        <Route path="/view-customer" element={<ViewCustomer />} />
-        <Route path="/deposit" element={<Deposit />} />
-        <Route path="/service-charge" element={<ServiceCharge />} />
-        <Route path="/delete-customer" element={<DeleteCustomer />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="*" element={<Error />} />
+        {authenticated ? (
+          <>
+            <Route path="/customer-dashboard" element={<CustomerDashboard />} />
+            <Route path="/customer-profile" element={<Profile />} />
+            <Route path="/customer-transactions" element={<Transactions />} />
+            <Route path="/customer-withdraw" element={<Withdraw />} />
+            <Route path="/customer-transfer" element={<Transfer />} />
+            <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
+            <Route path="/create-customer" element={<CreateCustomer />} />
+            <Route path="/view-customer" element={<ViewCustomer />} />
+            <Route path="/deposit" element={<Deposit />} />
+            <Route path="/service-charge" element={<ServiceCharge />} />
+            <Route path="/delete-customer" element={<DeleteCustomer />} />
+          </>
+        ) : (
+          <Route element={<Navigate to="/login" />} />
+        )}
       </Routes>
     </Router>
   );

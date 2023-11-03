@@ -24,7 +24,7 @@ const ViewCustomerHeader = () => {
                 </Link>
               </li>
               <li className="nav-item active custom-margin">
-                <Link className="login-navigate" to="/login">
+                <Link className="login-navigate" to="/logout">
                   Logout
                 </Link>
               </li>
